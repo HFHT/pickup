@@ -1,0 +1,8 @@
+.notacceptlist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.breadcrumb {
+  font-size: smaller
+}

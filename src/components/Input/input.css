@@ -1,0 +1,77 @@
+:root {
+    --color-input-text: black;
+    --color-input-placeholder: rgb(156 163 175);
+    --color-input-bg: rgb(249 250 251);
+    --color-input-box-bg: rgb(249 250 251);
+    --color-input-focus: rgb(59 130 246);
+    --color-input-outline: rgb(59 130 246);
+    --color-input-border: rgb(209 213 219);
+    --color-input-border-err: rgb(173, 74, 74);
+
+}
+
+:root.dark {
+    --color-input-text: white;
+    --color-input-placeholder: rgb(156 163 175);
+    --color-input-bg: rgb(55 65 81);
+    --color-input-box-bg: rgb(55 65 81);
+    --color-input-focus: rgb(59 130 246);
+    --color-input-outline: rgb(59 130 246);
+    --color-input-border: rgb(75 85 99);
+    --color-input-border-err: rgb(173, 74, 74);
+}
+
+label {
+    display: block;
+    font-weight: 500;
+    color: var(--color-input-text);
+    margin-left: 0.75rem;
+}
+
+label:focus-within {
+    color: var(--color-input-focus);
+}
+
+.label-span {
+    background-color: var(--color-input-bg);
+    color: var(--color-input-focus);
+}
+
+input {
+    color: var(--color-input-text);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    padding: 0.625rem;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.5rem;
+    border-color: var(--color-input-border);
+    width: 94%;
+    display: block;
+    margin-left: -0.75rem;
+    margin-top: -0.5rem;
+    background-color: var(--color-input-box-bg);
+
+}
+
+input:focus {
+    border-color: var(--color-input-outline);
+}
+
+input::placeholder {
+    color: var(--color-input-placeholder);
+}
+
+.inputerr {
+    border-color: var(--color-input-border-err);
+}
+.inputerr:focus {
+    border-color: var(--color-input-border-err);
+}
+
+.input-err-text {
+    display: block;
+    margin-top: -0.7rem;
+    color: rgb(253, 90, 90) !important;
+    width: fit-content;
+}

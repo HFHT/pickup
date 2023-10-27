@@ -1,0 +1,90 @@
+.buttonmain {
+    align-items: center;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    transition-property: all;
+    transition-duration: 150ms;
+    transition-timing-function: linear;
+    cursor: pointer;
+    background-color: inherit;
+    display: inline-flex;
+}
+
+.buttoncontained {
+    border-color: var(--color-input-border);
+    background-color: var(--color-btn-background);
+    border-style: solid;
+}
+
+.buttonoutlined {
+    border-color: var(--color-input-border);
+    border-style: solid;
+}
+
+.buttontext {
+    border-color: unset;
+    border-style: unset;
+}
+
+.buttonmain:hover {
+    background-color: var(--color-btn-hover);
+}
+
+.butttonmain:disabled,
+button[disabled] {
+    color: rgb(146, 145, 145);
+    background-color: rgb(99, 98, 98);
+}
+
+.buttonmain:disabled:hover {
+    background-color: rgb(99, 98, 98);
+}
+
+.buttonhidden {
+    visibility: hidden;
+}
+
+.buttonmain:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.buttonfull {
+    border-radius: 0.25rem;
+    border-width: 1px;
+}
+
+.buttonleft {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+    border-width: 1px;
+    margin-right: 0;
+}
+
+.buttonmiddle {
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-width: 1px;
+    margin-right: 0;
+}
+
+.buttonright {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    border-width: 1px;
+}
+
+.buttoniconleft {
+    margin-right: 0.25rem;
+    width: 1rem;
+}
+
+.buttoniconright {
+    margin-left: 0.25rem;
+    width: 1rem;
+}
