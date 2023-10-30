@@ -2,46 +2,35 @@ import { useAutocomplete } from '@vis.gl/react-google-maps';
 import { useEffect, useRef } from 'react';
 
 interface IAddr {
-    place: {
-        addr: string
-        lat: string
-        lng: string
-    };
+    place: IPlace;
     initValue?: string
     setPlace: Function;
     setHavePlace: Function;
 }
 
-
 export const Autocomplete = ({ place, initValue, setPlace, setHavePlace }: IAddr) => {
     const inputRef = useRef(null);
 
     const onPlaceChanged = (thisPlace: any) => {
-        // if (place.defaultPrevented) return
-        // place.preventDefault()
         console.log(place, thisPlace)
-        const thePlace = { ...thisPlace };
-        // place.stopPropagation()
+        const thePlace = { ...thisPlace }
 
         if (thePlace) {
-            thePlace.address_components.map((comp: any) => {
-                console.log(comp, comp.types[0] === 'postal_code')
-                // comp.types.find((e:any)=>{e==='postal_code'})
-            })
-            // thePlace.address_components.find((comp:any) => comp.types[0]==='postal_code')
             setPlace(
                 {
                     addr: (thePlace.formatted_address || thePlace.name),
                     lat: thePlace.geometry.location.lat(),
                     lng: thePlace.geometry.location.lng(),
-                    zip: thePlace.address_components.find((comp: any) => comp.types[0] === 'postal_code').long_name
+                    num: getComponent(thePlace, 'street_number').long_name,
+                    route: getComponent(thePlace, 'route').long_name,
+                    city: getComponent(thePlace, 'locality').long_name,
+                    state: getComponent(thePlace, 'administrative_area_level_1').long_name,
+                    c_cd: getComponent(thePlace, 'country').short_name,
+                    c_nm: getComponent(thePlace, 'country').long_name,
+                    zip: getComponent(thePlace, 'postal_code').long_name
                 });
             setHavePlace(true)
         }
-
-        //@ts-ignore Keep focus on input element
-        // inputRef.current && inputRef.current.focus();
-
     };
 
     useAutocomplete({
@@ -52,17 +41,17 @@ export const Autocomplete = ({ place, initValue, setPlace, setHavePlace }: IAddr
     const handleInputChange = (event: any) => {
         setPlace({ addr: event.target.value, lat: '', lng: '' });
     };
-    
+
     useEffect(() => {
         console.log(inputRef)
         console.log(initValue)
         if (inputRef && initValue) {
             console.log('ref and init')
-             //@ts-ignore
-            inputRef.current.value=initValue
+            //@ts-ignore
+            inputRef.current.value = initValue
         }
     }, [initValue])
-    
+
     return (
         <div className='autodiv'>
             <label className='text-sm'>
@@ -71,3 +60,10 @@ export const Autocomplete = ({ place, initValue, setPlace, setHavePlace }: IAddr
         </div>
     );
 };
+
+function getComponent(place: any, type: string) {
+    const tc = place.address_components.find((comp: any) => comp.types[0] === type)
+    console.log(tc)
+    if (tc) return tc
+    return { long_name: '', short_name: '' }
+}

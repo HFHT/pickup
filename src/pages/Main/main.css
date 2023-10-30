@@ -1,8 +1,108 @@
 .notacceptlist {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  border-style: solid;
+  border-width: thin;
+  border-color: var(--color-border);
+  border-radius: 5px;
+  padding: 1px 4px 1px 4px;
+}
+
+.notacceptitem {
+  border-bottom-style: solid;
+  border-width: thin;
+  border-color: var(--color-border);
+  display: flex;
+  align-items: center;
 }
 
 .breadcrumb {
   font-size: smaller
+}
+
+.ziplist {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+}
+.canceldiv {
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+.canceltext {
+  background-color: #eee;
+  color: black;
+}
+
+.mytoast {
+  position: fixed !important;
+  top: 3rem !important;
+}
+
+/**
+* ----------------------------------------------
+* Accordion styles
+* ----------------------------------------------
+**/
+.accordion {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+.accordion__item+.accordion__item {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.accordion__button {
+  background-color: #f4f4f4;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+}
+
+.accordion__button:hover {
+  background-color: #ddd;
+}
+
+.accordion__button:before {
+  display: inline-block;
+  content: '';
+  height: 10px;
+  width: 10px;
+  margin-right: 12px;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.accordion__button[aria-expanded='true']::before,
+.accordion__button[aria-selected='true']::before {
+  transform: rotate(45deg);
+}
+
+[hidden] {
+  display: none;
+}
+
+.accordion__panel {
+  padding: 4px 6px 4px 6px;
+  animation: fadein 0.35s ease-in;
+}
+
+/* -------------------------------------------------- */
+/* ---------------- Animation part ------------------ */
+/* -------------------------------------------------- */
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }

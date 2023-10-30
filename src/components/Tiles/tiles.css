@@ -1,11 +1,56 @@
 .tileGroup {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  padding-top: 8px;
-  padding-bottom: 8px;
+  grid-gap: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  background-color: var(--color-tile-bg);
+  align-items: center;
+
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: var(--color-li-border); */
+}
+
+
+
+.tileButton {
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0.4em 1em;
+  font-size: 0.8em;
+  /* font-weight: 500; */
+  font-family: inherit;
+  display: table;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  color: var(--color-tile);
+  background-color: var(--color-tile-bg);
+}
+
+.tileactive {
+  background-color: var(--color-tile-active);
+  border: 1.5px solid rgb(25, 26, 24);
+}
+
+.tileqty {
+  font-size: 0.8em;
+
+  margin: 1px;
   border-style: solid;
   border-width: 1px;
-  border-color: var(--color-li-border);
+  min-width: 5px;
+  border-radius: 5px;
+  position: relative;
+  top: -25px;
+  left: 2px;
+}
+
+
+.tileButton:hover {
+  background-color: var(--color-tile-hover);
+  border-color: #646cff;
 }
 
 @media (min-width: 412px) {
@@ -24,53 +69,4 @@
   .tileGroup {
     grid-template-columns: repeat(10, minmax(0, 1fr));
   }
-}
-
-.tileButton {
-  /* width: 150px;
-    height: 50px; */
-  letter-spacing: 0.5px;
-  /* background-color: #E0314B;
-    color: white;
-    font-size: 32px;
-    border: 1.5px solid #E0314B;
-    border-radius: 5px; */
-  cursor: pointer;
-}
-
-.tileactive {
-  background-color: #c264ad;
-  border: 1.5px solid rgb(25, 26, 24);
-}
-
-.tileqty {
-  margin: 1px;
-  border-style: solid;
-  border-width: 1px;
-  min-width: 5px;
-  border-radius: 5px;
-  position: relative;
-  top: -25px;
-  left: 0px;
-}
-
-button {
-  border-radius: 8px;
-  /* border: 1px solid transparent; */
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  /* background-color: #1a1a1a; */
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-
-button:hover {
-  border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }

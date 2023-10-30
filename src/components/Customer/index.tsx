@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react"
 import { Input } from "../Input";
+import Phone from "../Phone";
+
 import { Autocomplete } from "../GoogleAutocomplete";
 import { CONST_ROUTES, CONST_TIMES } from "../../constants";
+import PhoneInput from "react-phone-input-2";
 
 export function Customer({ schedDate, isOpen, name, phone, place, setPlace, appt, setAppt, setSchedDate, handlePhoneLookup, setName, setPhone, setAddr, handleSubmit }: any) {
 
-  const clearAppt: IAppt = { id: '', items: '', apt: '', note: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' }
-
+  const clearAppt: IAppt = { id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' }
+  const isEmail = (email: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+  const isPhone = (p: string) => p.length === 10
   const doSubmit = () => {
     console.log('doSubmit', appt)
     if (!appt) return
@@ -39,15 +43,24 @@ export function Customer({ schedDate, isOpen, name, phone, place, setPlace, appt
             <h4>Pickup information:{schedDate}</h4>
             <Input type='date' value={schedDate} onChange={(e: string) => setSchedDate(e)} title='Date' />
             <div className='pickphone'>
-              <Input type='text' value={phone} onChange={(e: string) => setPhone(e)} title='Phone' />
-              <button className='tile text-sm buttonoutlined buttonfull buttonmiddle' onClick={() => handlePhoneLookup()}>Lookup</button>
+              <PhoneInput
+                country={'us'}
+                value={phone}
+                onChange={(e: any) => setPhone(e)}
+              />
+              {/* <Input type='text' value={phone} onChange={(e: string) => setPhone(e)} title='Phone' /> */}
+              {/* <button className='tile text-sm buttonoutlined buttonfull buttonmiddle' onClick={() => handlePhoneLookup()}>Lookup</button> */}
 
             </div>
             Client Information:
-            <Input type='text' value={name} onChange={(e: string) => setName(e)} title='Name' />
+            <Input type='text' value={name.first} onChange={(e: string) => setName({...name, first: e})} title='First Name' />
+            <Input type='text' value={name.last} onChange={(e: string) => setName({...name, last: e})} title='Last Name' />
+
             {(!false) && <Autocomplete place={place.hasOwnProperty('addr') ? place.addr : ''} initValue={place.addr} setPlace={(e: any) => handleSetPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
             <Input type='text' value={appt.apt} onChange={(e: string) => setAppt({ ...appt, apt: e })} title='Apartment' />
-            <Input type='text' value={appt.note} onChange={(e: string) => setAppt({ ...appt, note: e })} title='Notes...' />
+            <Input type='text' value={appt.note} onChange={(e: string) => setAppt({ ...appt, note: e })} title='Gate Code... Notes...' />
+            <Input type='email' value={appt.email} onChange={(e: string) => setAppt({ ...appt, email: e })} title='Email address...' />
+
           </div>
           <div className='PU2 pickupitems'>
             <h4>Donation Information</h4>

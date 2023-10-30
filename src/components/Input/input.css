@@ -73,5 +73,6 @@ input::placeholder {
     display: block;
     margin-top: -0.7rem;
     color: rgb(253, 90, 90) !important;
+    width: -moz-fit-content;
     width: fit-content;
 }

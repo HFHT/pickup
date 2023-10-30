@@ -4,38 +4,13 @@ import './tiles.css';
 import { Input } from '../Input';
 import { Button } from '../Button';
 
-interface ITile {
-    tiles: string[]
+interface ITiles {
+    tiles: Iitems
     selected?: number | string
     chosen?: Iprods
     hasCustom?: string
-    onClick(e: string, i: number): Function | void
-}
-interface ITiles extends ITile {
+    onClick(e: string, i: number, t: string): Function | void
     onClear(e: string): Function | void
-}
-
-export const Tiles = ({ tiles, onClick, hasCustom = '', selected = -1 }: ITile) => {
-    const [custom, setCustom] = useState('')
-    // console.log('Tiles', tiles, selected)
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
-        onClick(e.currentTarget.name, id)
-    }
-    const handleCustom = (e: string) => {
-        setCustom(e);
-        onClick(e, tiles.length)
-    }
-    if (!tiles) alert('Undefined Tile')
-    return (
-        <div className="tileGroup">
-            {tiles && tiles.map((tileLabel, i) => (
-                <button key={i} name={tileLabel} onClick={(e) => handleClick(e, i)} className={(selected === i || selected.toString() === tileLabel) ? "tileButton tileactive" : "tileButton"}>
-                    {tileLabel === ' ' ? '---' : tileLabel}
-                </button>
-            ))}
-            {hasCustom && <Input type={hasCustom} value={custom} title={''} onChange={(e: any) => handleCustom(e)} />}
-        </div>
-    );
 
 }
 
@@ -43,8 +18,8 @@ export const TilesMulti = ({ tiles, chosen, onClick, onClear, hasCustom = '', se
     const [custom, setCustom] = useState('')
 
     // console.log('Tiles', tiles, selected)
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>, id: number) => {
-        onClick(e.currentTarget.name, id)
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>, id: number, t: string) => {
+        onClick(e.currentTarget.name, id, t)
     }
     // const handleCustom = (r: string) => {
     //     console.log('handleCustom', r, custom)
@@ -73,10 +48,10 @@ export const TilesMulti = ({ tiles, chosen, onClick, onClear, hasCustom = '', se
         <div className="tileGroup">
             {tiles && tiles.map((tileLabel, i) => (
                 <div key={i}>
-                    <button name={tileLabel} onClick={(e) => handleClick(e, i)} className={(isSelected(tileLabel)) ? "tileButton tileactive" : "tileButton"}>
-                        {tileLabel === ' ' ? '---' : tileLabel}
+                    <button name={tileLabel.i} onClick={(e) => handleClick(e, i, tileLabel.t)} className={(isSelected(tileLabel.i)) ? "tileButton tileactive" : "tileButton"}>
+                        {tileLabel.i === ' ' ? '---' : tileLabel.i}
                     </button>
-                    <span className={`${isSelectedQty(tileLabel) && 'tileqty'}`}>{isSelectedQty(tileLabel)}</span>
+                    <span className={`${isSelectedQty(tileLabel.i) && 'tileqty'}`}>{isSelectedQty(tileLabel.i)}</span>
                 </div>
             ))}
             {hasCustom && <Input type={hasCustom} value={custom} title={`Other`} onChange={(e: any) => { setCustom(e) }} />}
