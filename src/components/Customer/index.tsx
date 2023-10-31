@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Input } from "../Input";
-import Phone from "../Phone";
 
 import { Autocomplete } from "../GoogleAutocomplete";
 import { CONST_ROUTES, CONST_TIMES } from "../../constants";
