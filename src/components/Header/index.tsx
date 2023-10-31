@@ -1,12 +1,13 @@
 import { useContext, useState } from 'react';
 import './header.css';
+import * as logo from '../../assets/HabiStore_logo.webp'
 
 export function Header() {
-
+    console.log(logo)
     return (
         <>
             <div className="headlogo">
-                <img src='./src/assets/HabiStore_logo.webp' alt='logo'/>
+                <img src={logo.default} alt='logo'/>
             </div>
             <div className="headtitle">Donation Pickup</div>
             <div className="headbadges">
