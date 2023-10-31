@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react';
 import './header.css';
-import * as logo from '../../assets/HabiStore_logo.webp'
+import * as logo from '../../HabiStore_logo.webp'
 
 export function Header() {
     console.log(logo)
