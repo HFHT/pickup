@@ -8,6 +8,7 @@ import { fetchSAS } from './helpers/fetchAPI';
 
 const queryClient = new QueryClient();
 const sas = await fetchSAS();
+(async () => {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <QueryErrorResetBoundary>
     <QueryClientProvider client={queryClient}>
@@ -19,3 +20,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </QueryClientProvider>
   </QueryErrorResetBoundary>
 )
+})()
