@@ -14,14 +14,16 @@ import { usePhoneSave } from '../../hooks/usePhoneSave';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_ROUTE_MAX } from '../../constants';
+import { useImageUpload } from '../../hooks/useImageUpload';
 
 
 
-export function Main() {
+export function Main({ sas }: any) {
   const [zip, setZip] = useState('')
   const [sched, setSched] = useState('')
   const [understood, setUnderstood] = useState(false)
   const [done, setDone] = useState(false)
+  const [havePhotos, setHavePhotos] = useState(false)
   const [saved, setSaved] = useState(false)
   const [cancelled, setCancelled] = useState(false)
   const [donationList, setDonationList] = useState([])
@@ -33,6 +35,7 @@ export function Main() {
   const [appt, setAppt] = useState<IAppt>({ id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
   const [customer, doPhoneLookup, isLookupLoading] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
+  const [upLoadFile, imageProgress, imageDone, imageErr] = useImageUpload();
 
   // const dbSched = useQuery<any>({ queryKey: ['schedule', 'Schedule'], queryFn: fetchDB, staleTime: 1000 * 60 * 5 });
   const [dbSched, addNew, update] = useDbSched()
@@ -112,9 +115,10 @@ export function Main() {
           <ZipList isOpen={availSlots && !sched && !cancelled} availSlots={availSlots} zip={zip} setSched={(e: string) => setSched(e)} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={sched !== '' && !understood} setUnderstood={(e: boolean) => setUnderstood(e)} />
           <Donations isOpen={understood && !done} donations={donationList} setDonations={(e: any) => setDonationList(e)} setDone={() => setDone(true)} />
+          <Photos isOpen={done && !havePhotos} setHavePhotos={setHavePhotos} />
           <Customer
             schedDate={sched}
-            isOpen={done && !saved && !cancelled}
+            isOpen={havePhotos && !saved && !cancelled}
             name={name}
             phone={phone}
             place={googlePlace}
@@ -134,6 +138,36 @@ export function Main() {
       }
     </>
   )
+}
+
+function Photos({ isOpen, setHavePhotos }: any) {
+  function handleChange() {
+    console.log('change')
+  }
+  return <>
+    {isOpen &&
+      <div>
+        <Button onClick={() => setHavePhotos(true)}> Done </Button>
+
+        <div className='photogrid'>
+          <div>
+            <input title='file' type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
+          </div>
+          <div>
+            <input title='file1' type="file" id="input-file-upload1" multiple={true} onChange={handleChange} />
+          </div>
+        </div>
+        <div className='photogrid'>
+          <div>
+            <input title='file1' type="file" id="input-file-upload2" multiple={true} onChange={handleChange} />
+          </div>
+          <div>
+            <input title='file1' type="file" id="input-file-upload3" multiple={true} onChange={handleChange} />
+          </div>
+        </div>
+      </div>}
+
+  </>
 }
 
 function Saved({ isOpen }: any) {

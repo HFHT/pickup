@@ -16,6 +16,10 @@
   align-items: center;
 }
 
+.photogrid {
+  display:flex;
+}
+
 .breadcrumb {
   font-size: smaller
 }
