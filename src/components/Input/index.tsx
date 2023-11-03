@@ -97,7 +97,7 @@ export function Input(
                         </span>
                         <input
                             type={type}
-                            value={type==='date' ? dateFormat(theValue.value) : theValue.value}
+                            value={type === 'date' ? dateFormat(theValue.value) : theValue.value}
                             inputMode={inputMode}
                             placeholder={displayTitle}
                             defaultValue={defaultValue}
@@ -122,6 +122,8 @@ export function Input(
     //set border color to red
     function validate() {
         let theErr = '';
+        const isEmail = (email: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
+
         // console.log(theValue.value);
         // console.log(required, theValue.value.toString().length)
         if (theValue.value) {
@@ -141,6 +143,10 @@ export function Input(
                     if (type === 'date') {
                         min && theValue.value < min && (theErr = 'min Value');
                         max && theValue.value > max && (theErr = 'max Value');
+                    } else {
+                        if (type === 'email' && !isEmail(theValue.value.toString())) {
+                            theErr = 'Email address invalid';
+                        }
                     }
                 }
             }

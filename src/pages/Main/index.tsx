@@ -8,36 +8,35 @@ import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, Ac
 import { TilesMulti } from '../../components/Tiles';
 import { Customer } from '../../components/Customer';
 import { useDbSched } from '../../hooks/useDbSched';
-import { uniqueBarCode } from '../../helpers/barCode';
 import { usePhoneLookup } from '../../hooks/usePhoneLookup';
 import { usePhoneSave } from '../../hooks/usePhoneSave';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_ROUTE_MAX } from '../../constants';
 import { useImageUpload } from '../../hooks/useImageUpload';
+import { DragDropFile, Iimg, Iimgs } from '../../components/DragDropFile';
 
 
 
-export function Main({ sas }: any) {
+export function Main({ sas, id }: any) {
   const [zip, setZip] = useState('')
   const [sched, setSched] = useState('')
   const [understood, setUnderstood] = useState(false)
   const [done, setDone] = useState(false)
   const [havePhotos, setHavePhotos] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [submit, setSubmit] = useState(false)
   const [cancelled, setCancelled] = useState(false)
   const [donationList, setDonationList] = useState([])
   const [name, setName] = useState({ first: '', last: '' })
   const [phone, setPhone] = useState('')
   const [googlePlace, setGooglePlace] = useState<IPlace>({})
-  const [isEdit, setIsEdit] = useState<IEdit>()
 
   const [appt, setAppt] = useState<IAppt>({ id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
   const [customer, doPhoneLookup, isLookupLoading] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile, imageProgress, imageDone, imageErr] = useImageUpload();
 
-  // const dbSched = useQuery<any>({ queryKey: ['schedule', 'Schedule'], queryFn: fetchDB, staleTime: 1000 * 60 * 5 });
   const [dbSched, addNew, update] = useDbSched()
 
   const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched)[0] }, [dbSched])
@@ -46,10 +45,7 @@ export function Main({ sas }: any) {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleSubmit', e, appt, phone)
     if (e !== '' && appt) {
-      // in Edit mode the control variables will come from the db record, otherwise they are created
-      let dbEntry: ISched = { id: setID(), name: name, phone: phone, zip: whichZip(zip), place: googlePlace, appt: e, dt: dateFormat(null), src: whichSrc('w') }
-      // e = { ...e, name: name, _id: schedDate, zip: zip, place: addr, phone: phone, src: 'm' }
-      // console.log(e)
+      let dbEntry: ISched = { id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: e, dt: dateFormat(null), src: 'w' }
 
       addNew({ _id: sched, c: [dbEntry] }, dbSched)
       doPhoneSave(customer, dbEntry)
@@ -66,21 +62,7 @@ export function Main({ sas }: any) {
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
     setAppt({ id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
     setZip('')
-    setIsEdit({})
-    // setShowForm(false)
 
-    function setID() {
-      const theId = isEdit && isEdit.hasOwnProperty('id') ? isEdit.id : uniqueBarCode()
-      return theId ? theId : ''
-    }
-    function whichZip(z: any) {
-      const theId = isEdit && isEdit.hasOwnProperty('zip') ? isEdit.zip : z
-      return theId ? theId : ''
-    }
-    function whichSrc(z: any) {
-      const theId = isEdit && isEdit.hasOwnProperty('src') ? isEdit.src : z
-      return theId ? theId : ''
-    }
   }
   function handlePhoneLookup() {
     console.log('handlePhoneLookup')
@@ -95,6 +77,14 @@ export function Main({ sas }: any) {
     setPhone(p)
   }
   function handleCancel(e: any) {
+
+  }
+  function setPhotos(photos: Iimgs) {
+    console.log(photos)
+    if (photos.length === 0) return
+    photos.forEach((photo: Iimg) => {
+      upLoadFile(photo.blob, sas)
+    })
 
   }
   useEffect(() => {
@@ -115,7 +105,7 @@ export function Main({ sas }: any) {
           <ZipList isOpen={availSlots && !sched && !cancelled} availSlots={availSlots} zip={zip} setSched={(e: string) => setSched(e)} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={sched !== '' && !understood} setUnderstood={(e: boolean) => setUnderstood(e)} />
           <Donations isOpen={understood && !done} donations={donationList} setDonations={(e: any) => setDonationList(e)} setDone={() => setDone(true)} />
-          <Photos isOpen={done && !havePhotos} setHavePhotos={setHavePhotos} />
+          <Photos isOpen={done && !havePhotos} setHavePhotos={setHavePhotos} setPhotos={(e: any) => setPhotos(e)} />
           <Customer
             schedDate={sched}
             isOpen={havePhotos && !saved && !cancelled}
@@ -132,7 +122,8 @@ export function Main({ sas }: any) {
             setAddr={(e: any) => setAppt(e)}
             handleSubmit={(e: any) => handleSubmit(e)}
           />
-          <Saved isOpen={saved} />
+          <Confirm isOpen={saved} setSubmit={() => setSubmit(true)} />
+          <Saved isOpen={submit} />
           <Cancelled isOpen={cancelled} onClick={(e: any) => handleCancel(e)} />
         </>
       }
@@ -140,31 +131,26 @@ export function Main({ sas }: any) {
   )
 }
 
-function Photos({ isOpen, setHavePhotos }: any) {
-  function handleChange() {
-    console.log('change')
+function Confirm({ isOpen }: any) {
+  return (
+    <>
+      {isOpen && <div>confirm</div>}
+    </>
+
+  )
+}
+function Photos({ isOpen, setHavePhotos, setPhotos }: any) {
+  const [images, setImages] = useState<Iimgs>([])
+
+  function handleClick() {
+    setHavePhotos(true)
+    setPhotos(images)
   }
   return <>
     {isOpen &&
       <div>
-        <Button onClick={() => setHavePhotos(true)}> Done </Button>
-
-        <div className='photogrid'>
-          <div>
-            <input title='file' type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
-          </div>
-          <div>
-            <input title='file1' type="file" id="input-file-upload1" multiple={true} onChange={handleChange} />
-          </div>
-        </div>
-        <div className='photogrid'>
-          <div>
-            <input title='file1' type="file" id="input-file-upload2" multiple={true} onChange={handleChange} />
-          </div>
-          <div>
-            <input title='file1' type="file" id="input-file-upload3" multiple={true} onChange={handleChange} />
-          </div>
-        </div>
+        <Button onClick={() => handleClick()}> Done </Button>
+        <DragDropFile images={images} title='Please send us a photo of your items.' setImages={setImages} />
       </div>}
 
   </>

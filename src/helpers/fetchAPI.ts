@@ -8,7 +8,7 @@ type Group = { id: number }
 const baseURL = `${import.meta.env.VITE_MONGO_URL}`;
 
 export async function fetchSAS() {
-  const { url, sasKey } = await (await fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSasToken`)).json();
+  const { url, sasKey } = await (await fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSasToken?cont=habistorepickup`)).json();
   return { url, sasKey };
 }
 
