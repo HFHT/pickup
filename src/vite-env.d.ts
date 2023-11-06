@@ -51,6 +51,8 @@ interface ISched {
   zip: string;
   place: IPlace;
   appt: IAppt
+  imgs: string[]
+  items: any;
   src: string;
   call?: string;
   done?: boolean;

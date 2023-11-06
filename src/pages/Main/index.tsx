@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_ROUTE_MAX } from '../../constants';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import { DragDropFile, Iimg, Iimgs } from '../../components/DragDropFile';
+import { useHistoryBackTrap } from '../../hooks/useHistoryBack';
 
 
 
@@ -30,6 +31,7 @@ export function Main({ sas, id }: any) {
   const [donationList, setDonationList] = useState([])
   const [name, setName] = useState({ first: '', last: '' })
   const [phone, setPhone] = useState('')
+  const [imgs, setImgs] = useState<string[]>([])
   const [googlePlace, setGooglePlace] = useState<IPlace>({})
 
   const [appt, setAppt] = useState<IAppt>({ id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
@@ -40,12 +42,12 @@ export function Main({ sas, id }: any) {
   const [dbSched, addNew, update] = useDbSched()
 
   const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched)[0] }, [dbSched])
-
+  useHistoryBackTrap(handleBack)
   const handleSubmit = (e: any) => {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleSubmit', e, appt, phone)
     if (e !== '' && appt) {
-      let dbEntry: ISched = { id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: e, dt: dateFormat(null), src: 'w' }
+      let dbEntry: ISched = { id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: e, dt: dateFormat(null), items: donationList, imgs: imgs, src: 'w' }
 
       addNew({ _id: sched, c: [dbEntry] }, dbSched)
       doPhoneSave(customer, dbEntry)
@@ -59,10 +61,15 @@ export function Main({ sas, id }: any) {
     setSched('')
     setName({ first: '', last: '' })
     setPhone('')
+    setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
     setAppt({ id: '', items: '', apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
     setZip('')
 
+  }
+  async function handleBack() {
+    console.log('handleBack')
+    return false
   }
   function handlePhoneLookup() {
     console.log('handlePhoneLookup')
@@ -82,10 +89,12 @@ export function Main({ sas, id }: any) {
   function setPhotos(photos: Iimgs) {
     console.log(photos)
     if (photos.length === 0) return
-    photos.forEach((photo: Iimg) => {
-      upLoadFile(photo.blob, sas)
+    let photoNames: string[] = []
+    photos.forEach((photo: Iimg, idx: number) => {
+      photoNames[idx] = `${id}${idx}.${photo.blob.name.split('.').pop()}`
+      upLoadFile(photo.blob, photoNames[idx], sas)
     })
-
+    setImgs(photoNames)
   }
   useEffect(() => {
     if (!customer || customer.length < 2) return
@@ -281,14 +290,14 @@ function Donations({ isOpen, donations, setDonations, setDone }: IDonate) {
     console.log(t);
     toast.success(t, { autoClose: 7000 })
   }
-  function handleProducts(e: any, i: any, l: any, t: string) {
+  function handleProducts(e: any, i: any, l: any, t: string, b: number) {
     if (!e) return
 
     let adjust = [...donations]
     let found = false
-    console.log('handleProducts', donations, adjust, i, t)
+    console.log('handleProducts', donations, adjust, i, t, b)
     if (donations.length === 0) {
-      notify1("To add more of an item, press it's button again!")
+      notify1("Adjust quantities using left and right mouse buttons.")
     }
     // Is this a custom product? If so just add it, otherwise check for other attributes.
     if (i > l.length - 1) {
@@ -298,9 +307,16 @@ function Donations({ isOpen, donations, setDonations, setDone }: IDonate) {
       }
       console.log(adjust)
     } else {
-      adjust && adjust.length > 0 && adjust?.forEach((x: any) => {
+      adjust && adjust.length > 0 && adjust?.forEach((x: any, i: number, o: any) => {
         // console.log(x.prod, e)
-        if (x.prod === e) { x.qty = x.qty + 1; found = true }
+        if (x.prod === e) {
+
+          x.qty = x.qty + b;
+          if (x.qty === 0) {
+            o.splice(i, 1)
+          }
+          found = true
+        }
       })
       if (!found) {
         adjust?.push({ prod: e, qty: 1 })
@@ -473,19 +489,19 @@ function Donations({ isOpen, donations, setDonations, setDone }: IDonate) {
           <Button onClick={(e: any) => handleClear(e)}>Reset</Button>
           <Button onClick={(e: any) => setDone(e)}>Save/Done</Button>
           <ToastContainer position="top-left" className='mytoast' autoClose={3000} hideProgressBar={true} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
-
+          {/* <div>Right mouse button(+) Left mouse button(-)</div> */}
           <Accordion allowMultipleExpanded={true} allowZeroExpanded={true}>
-            <DonateType title='Bathroom:' hasCustom={'text'} chosen={donations} products={products.Bathroom} onClick={(e: any, i: any, l: any, t: string) => { handleProducts(e, i, l, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Bedroom:' hasCustom={'text'} chosen={donations} products={products.Bedroom} onClick={(e: any, i: any, l: any, t: string) => { handleProducts(e, i, l, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Dining Room:' hasCustom={'text'} chosen={donations} products={products['Dining Room']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Laundry:' hasCustom={'text'} chosen={donations} products={products['Laundry']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Bathroom:' hasCustom={'text'} chosen={donations} products={products.Bathroom} onClick={(e: any, i: any, l: any, t: string, b: number) => { handleProducts(e, i, l, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Bedroom:' hasCustom={'text'} chosen={donations} products={products.Bedroom} onClick={(e: any, i: any, l: any, t: string, b: number) => { handleProducts(e, i, l, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Dining Room:' hasCustom={'text'} chosen={donations} products={products['Dining Room']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Laundry:' hasCustom={'text'} chosen={donations} products={products['Laundry']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
 
-            <DonateType title='Living Room:' hasCustom={'text'} chosen={donations} products={products['Living Room']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Kitchen:' hasCustom={'text'} chosen={donations} products={products['Kitchen']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Living Room:' hasCustom={'text'} chosen={donations} products={products['Living Room']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Kitchen:' hasCustom={'text'} chosen={donations} products={products['Kitchen']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
 
-            <DonateType title='Office:' hasCustom={'text'} chosen={donations} products={products['Office']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Patio:' hasCustom={'text'} chosen={donations} products={products['Patio']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
-            <DonateType title='Home Improvement:' hasCustom={'text'} chosen={donations} products={products['Home Improvement']} onClick={(e: any, i: any, v: number, t: string) => { handleProducts(e, i, v, t) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Office:' hasCustom={'text'} chosen={donations} products={products['Office']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Patio:' hasCustom={'text'} chosen={donations} products={products['Patio']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
+            <DonateType title='Home Improvement:' hasCustom={'text'} chosen={donations} products={products['Home Improvement']} onClick={(e: any, i: any, v: number, t: string, b: number) => { handleProducts(e, i, v, t, b) }} onClear={(e: any) => { handleClear(e) }} />
 
           </Accordion>
         </>}
@@ -502,9 +518,9 @@ interface IType {
   onClear: Function
 }
 function DonateType({ products, title, chosen, hasCustom, onClick, onClear }: IType) {
-  const handleClick = (e: string, id: number, t: string) => {
+  const handleClick = (e: string, id: number, t: string, b: number) => {
     console.log('DonateType', e, id)
-    onClick(e, id, products, t)
+    onClick(e, id, products, t, b)
   }
   const handleClear = (e: string) => {
     console.log('Products-handleClear')
@@ -519,7 +535,7 @@ function DonateType({ products, title, chosen, hasCustom, onClick, onClear }: IT
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel>
-        <TilesMulti tiles={products} selected={0} chosen={chosen} hasCustom={hasCustom} onClick={(e: any, i: any, t: string) => handleClick(e, i, t)} onClear={(e: any) => handleClear(e)} />
+        <TilesMulti tiles={products} selected={0} chosen={chosen} hasCustom={hasCustom} onClick={(e: any, i: any, t: string, b: number) => handleClick(e, i, t, b)} onClear={(e: any) => handleClear(e)} />
       </AccordionItemPanel>
     </AccordionItem>
   )

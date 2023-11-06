@@ -8,12 +8,12 @@ export function useImageUpload() {
     const [imageErr, setImageErr] = useState({ hasError: false, errDesc: '' });
     const blobClientErrors = ['RestError: This request is not authorized to perform blob overwrites.'];
 
-    function doUpload(file: any, sas: any) {
+    function doUpload(file: any, name:string, sas: any) {
         console.log('imageUpload:', file, typeof file)
         console.log('Sas key:', sas.url, sas.sasKey)
         
         const container = 'habistorepickup'
-        var blobName = file.name
+        var blobName = name
         var login = `${sas.url}/${container}/${blobName}?${sas.sasKey}`;
         var blockBlobClient = new BlockBlobClient(login, new AnonymousCredential)
         const reader = new FileReader()
@@ -22,7 +22,7 @@ export function useImageUpload() {
             console.log('Reader', reader)
             //@ts-ignore
             blockBlobClient.uploadData(reader.result)
-                .then(() => setImageDone(`${sas.url}/habistorepickup/${file.name}`))
+                .then(() => setImageDone(`${sas.url}/habistorepickup/${name}`))
                 .catch((e) => {
                     alert(e);
                     setImageErr({ hasError: true, errDesc: e });

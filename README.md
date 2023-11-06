@@ -10,6 +10,7 @@ Calculate the next cell for the Unassigned route.
 buildSlots remove almost full days.
 buildSlots remove the slots/total on the string.
 Go backwards and forwards
+-- finish using the back button
 Cancel - ask for reason. convenient date/time, accepted items, other
 
 
