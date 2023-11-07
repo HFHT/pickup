@@ -8,7 +8,7 @@ import { find_id } from "../helpers/find_id";
 // import { find_id, find_row, updateDB } from "../helpers";
 
 export function useDbSched() {
-    const sched: Idb = useQuery<any>({ queryKey: ['schedule', 'Schedule'], queryFn: fetchDB, staleTime: 1000 * 60 * 5 }).data
+    const sched: Idb = useQuery<any>({ queryKey: ['schedule', 'Schedule'], queryFn: fetchDB, refetchInterval: 1000 * 60 * 2 }).data
     const queryClient = useQueryClient();
 
     const updateItems = useMutation<any, any, { item: any, db: string, insert: boolean }>(
