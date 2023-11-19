@@ -267,7 +267,7 @@ function Cancelled({ isOpen, onClick }: any) {
     <>
       {isOpen && <div className='canceldiv'>
         <h3>Thank you for thinking of us. </h3>
-        <blockquote>Before you go could you let us know why you cancelled your donation?</blockquote>
+        <blockquote>Before you go, could you let us know why you cancelled your donation?</blockquote>
         <textarea title='Reason' placeholder='Reason...' rows={4} cols={40} className='canceltext' spellCheck>
         </textarea>
         <Button onClick={() => onClick()}>Done</Button>
