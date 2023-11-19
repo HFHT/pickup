@@ -4,6 +4,7 @@ import { shopifyCustSearch } from "../helpers/shopify";
 export function usePhoneLookup() {
     const [theResult, setTheResult]:any = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [done, setDone] = useState(false)
 
     const doPhoneLookup = async (phone: string) => {
         setIsLoading(true)
@@ -11,6 +12,7 @@ export function usePhoneLookup() {
         //result array[0] is array of Shopify customers (customers empty not found), array[1] is array (empty not found)
         setTheResult(response)
         setIsLoading(false)
+        setDone(true)
     }
-    return [theResult, doPhoneLookup, isLoading];
+    return [theResult, doPhoneLookup, isLoading, done];
 }

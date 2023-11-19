@@ -16,91 +16,173 @@ input::-webkit-outer-spin-button {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  /* color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424; */
-
+  color-scheme: light dark;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --color-background: white;
-  --color-text: #222;
-  --color-btn-hover: rgb(40, 119, 192);
-  --color-btn-text: white;
-  --color-btn-background: rgb(14 165 233);
-  --color-drawer-bg: rgb(202, 200, 200);
-  --color-tile-bg: #ddd;
-  --color-tile-active: rgb(177, 240, 177);
-  --color-tile-hover: rgb(120, 235, 120);
-
-  --color-tile: #222;
-  --color-border: lightgray;
-  --svg-fill: black;
-  --svg-bg: white;
-  color-scheme: light dark;
-
 }
-
-:root.dark {
-  --color-background: rgb(30 41 59);
-  --color-text: #DDD;
-  --color-btn-background: rgb(40, 119, 192);
-  --color-btn-off-background: #7d7c7c;
-  --color-btn-text: rgb(22, 22, 22);
-  --color-btn-hover: rgb(14 165 233);
-  --color-drawer-bg: rgb(51, 65, 85);
-  --color-tile-bg: gray;
-  --color-border: lightgray;
-  --svg-fill: white;
-  --svg-bg: black;
-}
-
 
 @media (prefers-color-scheme: dark) {
   :root {
-    background-color: rgb(30 41 59);
-    color: #DDD;
+
+    --color-background: rgb(30 41 59);
+    --color-text: #DDD;
+    --color-textarea: black;
+    --color-textarea-background: lightgray;
+
+    --color-btn-background: rgb(40, 119, 192);
+    --color-btn-off-background: #7d7c7c;
+    --color-btn-text: rgb(22, 22, 22);
+    --color-btn-hover: rgb(14 165 233);
+    --color-drawer-bg: rgb(51, 65, 85);
+
+    --color-tile-bg: lightgray;
+    --color-tile-active: rgb(177, 240, 177);
+    --color-tile-hover: rgb(120, 235, 120);
+    --color-tile-border: white;
+    --color-tile: #222;
+    --color-tile-qty: #222;
+
+    --color-border: lightgray;
+    --svg-fill: white;
+    --svg-bg: black;
+    --color-link: #646cff;
+    --color-link-hover: #535bf2;
+
+    --color-glyph: white;
+    --color-glyph-bg: darkred;
+
+    --color-input-text: white;
+    --color-input-placeholder: rgb(156 163 175);
+    --color-input-bg: rgb(55 65 81);
+    --color-input-box-bg: rgb(55 65 81);
+    --color-input-focus: rgb(59 130 246);
+    --color-input-outline: rgb(59 130 246);
+    --color-input-border: rgb(75 85 99);
+    --color-input-border-err: rgb(119, 29, 29);
+    --color-input-err: rgb(173, 74, 74);
+
+    --color-accordian-border: rgba(255, 255, 255, 0.2);
+    --color-accordian-btn-bg: rgb(55 65 81);
+    --color-accordian-btn: white;
+    --color-accordian-btn-hover: rgb(80, 99, 129);
   }
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    background-color: white;
-    color: #222;
+    --color-background: white;
+    --color-text: #222;
+    --color-textarea: white;
+    --color-textarea-background: #222;
+
+    --color-btn-hover: rgb(40, 119, 192);
+    --color-btn-text: white;
+    --color-btn-background: rgb(14 165 233);
+    --color-drawer-bg: rgb(202, 200, 200);
+
+    --color-tile-bg: #ddd;
+    --color-tile-active: rgb(177, 240, 177);
+    --color-tile-hover: rgb(120, 235, 120);
+    --color-tile-border: black;
+    --color-tile: #222;
+    --color-tile-qty: #222;
+
+    --color-border: lightgray;
+    --svg-fill: black;
+    --svg-bg: white;
+    --color-link: #646cff;
+    --color-link-hover: #535bf2;
+
+    --color-glyph: white;
+    --color-glyph-bg: darkred;
+
+    --color-input-text: black;
+    --color-input-placeholder: rgb(156 163 175);
+    --color-input-bg: rgb(249 250 251);
+    --color-input-box-bg: rgb(249 250 251);
+    --color-input-focus: rgb(59 130 246);
+    --color-input-outline: rgb(59 130 246);
+    --color-input-border: rgb(209 213 219);
+    --color-input-border-err: rgb(119, 29, 29);
+    --color-input-err: rgb(173, 74, 74);
+
+    --color-accordian-border: rgba(0, 0, 0, 0.1);
+    --color-accordian-btn-bg: #f4f4f4;
+    --color-accordian-btn: #444;
+    --color-accordian-btn-hover: #ddd;
+
   }
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--svg-fill);
   text-decoration: inherit;
 }
 
 a:hover {
-  color: #535bf2;
+  color: var(--color-link-hover);
 }
 
 body {
-  margin: 0;
+  margin: 0 auto;
   padding: 0 10px 0 10px;
-  display: flex;
+  max-width: 500px;
+  /* display: flex;
   place-items: center;
-  min-width: 320px;
+  min-width: 320px; */
   min-height: 100vh;
   background-color: var(--color-background);
   color: var(--color-text);
   /* overflow-y: hidden; */
 }
 
+textarea {
+  color: var(--color-textarea);
+  background-color: var(--color-textarea-background);
+  height: 4em;
+  width: 22em;
+  margin-top: 8px;
+}
+
 h1 {
-  font-size: 3.2em;
+  font-size: 1.7em;
   line-height: 1.1;
 }
 
+h2 {
+  font-size: 1.5em;
+  line-height: 1.1;
+}
+
+h3 {
+  font-size: 1.17em;
+  line-height: 1.1;
+}
+
+
+@media (max-width: 319px) {
+  textarea {
+    width: 19em;
+  }
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+
 img,
 svg {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 button {

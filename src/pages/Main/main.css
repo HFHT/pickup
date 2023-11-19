@@ -1,3 +1,59 @@
+.navigation {
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+}
+.navleft {
+  justify-items:flex-start;
+}
+.navright {
+  justify-items:flex-end;
+}
+.donateinput {
+  display:grid;
+  grid-template-columns: 1fr;
+}
+.pickphoneinput {
+  margin-left: unset;
+  width: 90%;
+  margin-top: 2px;
+}
+.pickphone {
+  margin-top: 0.8rem;
+}
+.addrdiv {
+  margin-bottom: 6px;
+}
+.customerimage {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  background-image: url(https://hfhtdev.blob.core.windows.net/production/Option_1_2.png);
+  background-size:cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 60vh;
+  opacity: 0.7;
+}
+.savedimage {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  background-image: url(https://hfhtdev.blob.core.windows.net/production/familypartner_habitattucson-scaled.jpg);
+  background-size:contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 40vh;
+  opacity: 0.7;
+}
+.cancelimage {
+  margin-top: 10px;
+  margin-bottom: 8px;
+  background-image: url(https://hfhtdev.blob.core.windows.net/production/habistore-front-sign_670x_crop_center.webp);
+  background-size:contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 40vh;
+  opacity: 0.7;
+}
 .notacceptlist {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -9,15 +65,46 @@
 }
 
 .notacceptitem {
-  border-bottom-style: solid;
+  border-bottom-style: outset;
   border-width: thin;
   border-color: var(--color-border);
   display: flex;
   align-items: center;
 }
 
-.photogrid {
-  display:flex;
+.photogrid .container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.photogrid .container .image {
+  width: 75px;
+  margin-right: 5px;
+  height: 75px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.photogrid .container .image img {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
+
+.photogrid .container .image span {
+  position: absolute;
+  top: -2px;
+  right: 9px;
+  font-size: 20px;
+  cursor: pointer;
+
 }
 
 .breadcrumb {
@@ -29,10 +116,35 @@
   grid-template-columns: 1fr 1fr;
 
 }
+.zipselected {
+  background-color: red;
+}
+.zipclosed {
+  background-image: url(https://hfhtdev.blob.core.windows.net/production/habitstore-interior-store.jpg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 80vh;
+  opacity:0.7;
+}
+.ziptext {
+  display:flex;
+  justify-content: center;
+  align-items:center;
+  height: 20vh;
+  margin-left: 8px;
+  color:white;
+  /* font-weight: 700; */
+}
 .canceldiv {
   display:grid;
   grid-template-columns: 1fr;
   gap: 4px;
+}
+.confirmdiv {
+  display:grid;
+  grid-template-columns: 1fr 6fr;
+  gap: 2px;
 }
 .canceltext {
   background-color: #eee;
@@ -50,17 +162,17 @@
 * ----------------------------------------------
 **/
 .accordion {
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-accordian-border);
   border-radius: 2px;
 }
 
 .accordion__item+.accordion__item {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid var(--color-accordian-border);
 }
 
 .accordion__button {
-  background-color: #f4f4f4;
-  color: #444;
+  background-color: var(--color-accordian-btn-bg);
+  color: var(--color-accordian-btn);
   cursor: pointer;
   padding: 18px;
   width: 100%;
@@ -69,7 +181,7 @@
 }
 
 .accordion__button:hover {
-  background-color: #ddd;
+  background-color: var(--color-accordian-btn-hover);
 }
 
 .accordion__button:before {

@@ -21,11 +21,12 @@ export const fetchAndSetAll = async (collection: any, isGpt: boolean = false) =>
         setter(choose(isGpt, allData[i]));
     });
 
-    function choose(b:boolean,g:any) {
+    function choose(b: boolean, g: any) {
         console.log(g)
         if (g.hasOwnProperty('choices')) {
             console.log(g.choices[0].text)
-            return g.choices[0].text.replace(/[\r\n|\n]+/gm, '').replace(/[\"]/gm,'')
+            console.log(g.choices[0].text.replace(/[\r\n|\n]+/gm, ''))
+            return g.choices[0].text === '' ? [] : JSON.parse(g.choices[0].text)
         }
         return g
     }

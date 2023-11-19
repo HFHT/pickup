@@ -1,0 +1,38 @@
+
+
+.aimain {
+    min-height: 3rem;
+}
+
+.aitext {
+    /* padding: 1rem; */
+}
+.airesults {
+    display:grid;
+    grid-template-columns: 1fr;
+    border-style:solid;
+    border-width:thin;
+    border-radius: 5px;
+    border-color: var(--color-border);
+}
+.airow {
+    font-weight:bold;
+    margin: 4px 0px 4px 0px;
+
+}
+.airdiv {
+    margin: 0 4px;
+    border-bottom: 1px solid;
+    border-color: var(--color-border);
+
+}
+.airmsg {
+    font-size: small;
+}
+.aicontrols {
+
+}
+
+.aibutton {
+
+}

@@ -93,7 +93,7 @@ function buildShopifyAdd(appt: ISched) {
                     "email": appt.appt.email,
                     "phone": appt.phone,  // +15142546011
                     "verified_email": false,
-                    "note": `${dateFormat(null)} donated: ${appt.appt.items}`,
+                    "note": `${dateFormat(null)} donated: ${itemsToList(appt.items)}`,
                     "tags": 'Pickup',
                     "addresses": [
                         {
@@ -115,11 +115,18 @@ function buildShopifyAdd(appt: ISched) {
     }
 }
 
+function itemsToList(theItems: any) {
+
+    return theItems.map((ti: any) => (
+        ti.qty === 0 ? `${ti.prod}` : `${ti.prod}(${ti.qty})`
+    ))
+}
+
 function buildShopifyUpdate(customer: any, appt: ISched) {
     console.log(customer, customer.customers[0])
     let ci: any = {}
     ci.id = customer.customers[0].id
-    ci.note = `${customer.customers[0].note} ${dateFormat(null)} donated: ${appt.appt.items}`
+    ci.note = `${customer.customers[0].note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}`
     ci.tags = buildTags(customer.customers[0].tags)
     if (!customer.customers[0].email) ci.email = appt.appt.email
     if (!customer.customers[0].last_name) ci.last_name = appt.name.last

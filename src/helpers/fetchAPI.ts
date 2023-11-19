@@ -8,8 +8,10 @@ type Group = { id: number }
 const baseURL = `${import.meta.env.VITE_MONGO_URL}`;
 
 export async function fetchSAS() {
-  const { url, sasKey } = await (await fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSasToken?cont=habistorepickup`)).json();
-  return { url, sasKey };
+  try {
+    const { url, sasKey } = await (await fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSasToken?cont=habistorepickup`)).json();
+    return { url, sasKey };
+  } catch (error: any) { console.log(error); return null }
 }
 
 // Used before React is loaded
@@ -23,7 +25,7 @@ export async function fetchAPI({ req, error, isObj = false }: State): Promise<St
   return fetch(`${baseURL}?req=${encodeURIComponent(JSON.stringify(req))}`, options)
     .then(response => response.json())
     .then(data => { return isObj ? data : data[0] })
-    .catch(error => console.log(error));
+    .catch(error => { console.log(error); return null });
 }
 
 // Used by React UseQuery Hook to fetch data, the collection is passed.
@@ -40,7 +42,7 @@ export const fetchDB = ({ queryKey }: any): Promise<Group[]> => {
     fetch(`${baseURL}?req=${encodeURIComponent(JSON.stringify({ method: 'find', db: 'Truck', collection: db, find: find }))}`, { method: "GET", headers: new Headers() })
       .then(response => response.json())
       .then(data => { return data })
-      .catch(error => {console.log(error); alert('Could not get the Schedule from the Database.');return []})
+      .catch(error => { console.log(error); alert('Could not get the Schedule from the Database.'); return [] })
   )
 }
 

@@ -9,6 +9,7 @@ interface IInput {
     title: string;
     setter?: Function;          // State is controlled locally and only sent on Enter or Blur
     onChange?: Function;        // State is controlled externally 
+    onEmpty?: Function;
     error?: Function;
     defaultValue?: string;
     autoFocus?: boolean;
@@ -34,7 +35,7 @@ interface IVal {
 }
 
 export function Input(
-    { type, value, inputMode, title, setter, onChange, error, defaultValue, autoFocus, disabled, enterKey, textOnly, required, autoComplete,
+    { type, value, inputMode, title, setter, onChange, onEmpty, error, defaultValue, autoFocus, disabled, enterKey, textOnly, required, autoComplete,
         isURL, isNumber, size, max, min, maxLength, minLength, spellCheck, classes
     }: IInput) {
 
@@ -56,11 +57,15 @@ export function Input(
         setSpanTitle((inputValue.length > 0 || type === 'date') ? displayTitle : '');
     }
     const handleEnter = (e: any) => {
-        console.log('enter', enterKey);
+        // console.log('enter', enterKey);
         if (enterKey) {
             setter && setter(theValue.value);
             setTheValue({ value: value, event: e });
         }
+    }
+    const handleBackspace = (e: any) => {
+        // console.log(e.code, value)
+        if (value.toString().length === 0) onEmpty && onEmpty();
     }
     const handleBlur = (e: any) => {
         // setter && errText === '' && setter(theValue.value)
@@ -106,7 +111,7 @@ export function Input(
                             disabled={disabled} autoFocus={autoFocus} required={required} size={size}
                             min={min} max={max} minLength={minLength} maxLength={maxLength}
                             onChange={(e) => handleChange(e.target.value, e)}
-                            onKeyUp={(e) => { e.code === 'Enter' && handleEnter(e) }}
+                            onKeyUp={(e) => { e.code === 'Backspace' && handleBackspace(e); e.code === 'Enter' && handleEnter(e) }}
                             onBlur={(e) => handleBlur(e)}
                             className={`${errText !== '' && 'inputerr'} ${classes}`}>
                         </input>
