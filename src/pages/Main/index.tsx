@@ -322,7 +322,7 @@ function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }:
   return (<>
     {isOpen && availSlots &&
       <>
-        <Input type={'text'} value={zip} title={'Please enter your zip code'} onChange={(e: string) => setZip(e)} />
+        <Input type={'number'} value={zip} title={'Please enter your zip code'} onChange={(e: string) => setZip(e)} />
         <div className={`${zipOpen() ? 'zipopen' : 'zipclosed'} zipmenu`}>
           {zipOpen() && (zipFound() ? 'Available Pickup Dates:' : 'Not in our Service Area')}
           {zipOpen() && zipFound() ?

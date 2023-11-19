@@ -21,3 +21,4 @@ Add spinners, on loading, on waiting for Shopify customer lookup, on Save.
 been taken'
 --- perhaps resubmit without the email, and/or notify the scheduler to resolve the discrepency.
 
+on mobile an accidental pulldown refreshes browser back to page, intercept it.
