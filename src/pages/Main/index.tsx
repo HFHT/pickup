@@ -38,7 +38,7 @@ export function Main({ sas, settings, id }: any) {
   const [maxPage, setMaxPage] = useState(0)
   const [customItems, setCustomItems] = useState([])
 
-  const [appt, setAppt] = useState<IAppt>({ id: id, items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
+  const [appt, setAppt] = useState<IAppt>({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
   const [dbEntry, setDBEntry] = useState<ISched | null>(null)
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
@@ -64,6 +64,7 @@ export function Main({ sas, settings, id }: any) {
       setDBEntry({ id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: e, dt: dateFormat(null), items: theseDonations, imgs: imgs, src: 'w' })
     } else {
       setCancelled(true)
+      setCurPage(6)
     }
     // setCurPage(6)
   }
@@ -80,7 +81,7 @@ export function Main({ sas, settings, id }: any) {
     setPhone('')
     setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, items: '', apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
+    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
     setDBEntry(null)
     setZip('')
     setCurPage(5)
@@ -152,7 +153,7 @@ export function Main({ sas, settings, id }: any) {
     setPhone('')
     setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, items: '', apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
+    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
     setDBEntry(null)
     setZip('')
   }
@@ -328,7 +329,7 @@ function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }:
           {zipOpen() && zipFound() ?
             <div className='ziplist'>
               {availSlots[zip].map((availSlot: any, key: number) => (
-                <Button key={key} disabled={isDayClosed(availSlot)} variant={sched === availSlot.d ? 'contained' : 'outlined'} classes={sched === availSlot.d ? 'zipselected' : ''} onClick={() => setSched(`${availSlot.d}`)}>{dateDayName(availSlot.d)} {availSlot.d}</Button>
+                <Button key={key} variant={sched === availSlot.d ? 'contained' : 'outlined'} classes={isDayClosed(availSlot) ? 'hidden' : ''} onClick={() => setSched(`${availSlot.d}`)}>{dateDayName(availSlot.d)} {availSlot.d}</Button>
               ))}
             </div>
             :

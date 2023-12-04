@@ -4,8 +4,12 @@ This is to be used by Tucson HabiStore's donors to schedule pickups of donated i
 
 Todo:
 Calculate the next cell for the Unassigned route.
+
 If no slots are available, message to contact the scheduler.
+On Thank you page, have a Done button that returns to the start page.
 Remove toast
+Make image upload size smaller.
+Make the glamor photos smaller.
 
 Breadcrumbs - Number of items, number of photos
 Cookie to hold the customer object, check the cookie and autofill if it exists.

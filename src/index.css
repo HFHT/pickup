@@ -235,3 +235,7 @@ button:focus-visible {
   font-size: 1.875rem;
   line-height: 2.25rem;
 }
+
+.hidden {
+  display: none !important;
+}

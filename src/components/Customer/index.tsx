@@ -8,7 +8,7 @@ import { Input } from "../Input";
 
 export function Customer({ id, isOpen, name, phone, lookupDone, place, setPlace, appt, setAppt, setName, setPhone, setHaveCustomer }: any) {
   const [canSave, setCanSave] = useState(name.first && name.last && place && place.city && phone && appt.email)
-  const clearAppt: IAppt = { id: id, items: '', apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' }
+  const clearAppt: IAppt = { id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' }
   const isEmail = (email: string) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
   const doSubmit = () => {
     console.log('doSubmit', appt)
@@ -56,7 +56,7 @@ export function Customer({ id, isOpen, name, phone, lookupDone, place, setPlace,
             </div>
             {lookupDone ?
               <>
-                <h3>Client Information:</h3>
+                <h3>Contact information...</h3>
                 {(!false) && <Autocomplete place={place.hasOwnProperty('addr') ? place.addr : ''} initValue={place.addr} setPlace={(e: any) => handleSetPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
 
                 <Input type='text' value={name.first} inputMode={'text'} minLength={1} onChange={(e: string) => setName({ ...name, first: e })} title='First Name' />

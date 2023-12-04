@@ -53,13 +53,13 @@ interface ISched {
   appt: IAppt
   imgs: string[]
   items: any;
-  src: string;
+  src: null | '' | 'w' | 's' | 'o';
   call?: string;
   done?: boolean;
+  resched?: boolean;
 }
 interface IAppt {
   id: string;
-  items: string;
   apt: string;
   note: string;
   email: string;
