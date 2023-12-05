@@ -3,8 +3,6 @@ import './main.css';
 import { dateDayName, dateFormat } from '../../helpers/dateDB';
 import { buildSlots } from '../../helpers/buildSlots';
 import { Button } from '../../components/Button';
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from "react-accessible-accordion";
-import { TilesMulti } from '../../components/Tiles';
 import { Customer } from '../../components/Customer';
 import { useDbSched } from '../../hooks/useDbSched';
 import { usePhoneLookup } from '../../hooks/usePhoneLookup';
@@ -19,8 +17,7 @@ import { BadgeIcons } from '../../icons/BadgeIcons';
 import { Input } from '../../components/Input';
 import { find_row } from '../../helpers/find_id';
 import { Donations } from '../Donations';
-
-
+import { findFirstSlot } from '../../helpers/findFirstSlot';
 
 export function Main({ sas, settings, id }: any) {
   const [zip, setZip] = useState('')
@@ -42,7 +39,7 @@ export function Main({ sas, settings, id }: any) {
   const [dbEntry, setDBEntry] = useState<ISched | null>(null)
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
-  const [upLoadFile, imageProgress, imageDone, imageErr] = useImageUpload();
+  const [upLoadFile] = useImageUpload();
 
   const [dbSched, addNew, update] = useDbSched()
 
@@ -61,13 +58,14 @@ export function Main({ sas, settings, id }: any) {
         console.log(theseDonations)
         if (d !== undefined && d !== '') { theseDonations.push({ prod: d, qty: 0 }) }
       })
-      setDBEntry({ id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: e, dt: dateFormat(null), items: theseDonations, imgs: imgs, src: 'w' })
+      setDBEntry({ id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: { ...e, time: findFirstSlot(dbSched,sched) }, dt: dateFormat(null), items: theseDonations, imgs: imgs, src: 'w' })
     } else {
       setCancelled(true)
       setCurPage(6)
     }
     // setCurPage(6)
   }
+
   const handleSubmit = () => {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleSubmit', appt, phone, sched)
@@ -81,13 +79,14 @@ export function Main({ sas, settings, id }: any) {
     setPhone('')
     setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
+    setAppt({ id: id, apt: '', note: '', email: '', slot: '', rt: 'u', time: '', cell: '' })
     setDBEntry(null)
     setZip('')
     setCurPage(5)
     setDonationList([])
     setCustomItems([])
   }
+
   async function handleBack() {
     console.log('handleBack')
     return false
@@ -167,7 +166,7 @@ export function Main({ sas, settings, id }: any) {
 
           <ZipList isOpen={curPage === 0} availSlots={availSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={sched} setSched={(e: any) => { handleNext(1); setSched(e) }} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={curPage === 1} setUnderstood={() => handleNext(2)} />
-          <Donations isOpen={curPage === 2} donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e)}}/>
+          <Donations isOpen={curPage === 2} donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }} />
           <Photos isOpen={curPage === 3} setHavePhotos={setHavePhotos} setPhotos={(e: any) => { handleNext(4); setPhotos(e) }} />
           <Customer
             id={id}

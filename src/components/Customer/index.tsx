@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
-
 import { Autocomplete } from "../GoogleAutocomplete";
-import { CONST_ROUTES, CONST_TIMES } from "../../constants";
 import PhoneInput from "react-phone-input-2";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -14,8 +12,7 @@ export function Customer({ id, isOpen, name, phone, lookupDone, place, setPlace,
     console.log('doSubmit', appt)
     if (!appt) return
     if (place.lat === '' || place.lng === '') { alert('Check address, could not locate GPS coordinates.') }
-    console.log(calcCell(appt.rt, appt.time))
-    setHaveCustomer({ ...appt, cell: calcCell(appt.rt, appt.time) })
+    setHaveCustomer({ ...appt })
   }
 
   const doClear = () => {
@@ -57,8 +54,7 @@ export function Customer({ id, isOpen, name, phone, lookupDone, place, setPlace,
             {lookupDone ?
               <>
                 <h3>Contact information...</h3>
-                {(!false) && <Autocomplete place={place.hasOwnProperty('addr') ? place.addr : ''} initValue={place.addr} setPlace={(e: any) => handleSetPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
-
+                {(!false) && <Autocomplete place={place.hasOwnProperty('addr') ? place.addr : ''} initValue={place.addr} setPlace={(e: any) => setPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
                 <Input type='text' value={name.first} inputMode={'text'} minLength={1} onChange={(e: string) => setName({ ...name, first: e })} title='First Name' />
                 <Input type='text' value={name.last} inputMode={'text'} minLength={3} onChange={(e: string) => setName({ ...name, last: e })} title='Last Name' />
                 <Input type='text' value={appt.apt} onChange={(e: string) => setAppt({ ...appt, apt: e })} title='Unit / Apartment' />
@@ -73,14 +69,5 @@ export function Customer({ id, isOpen, name, phone, lookupDone, place, setPlace,
       }
     </>
   )
-
-  function handleSetPlace(e: any) {
-    console.log(place.addr)
-    setPlace(e)
-  }
-
-  function calcCell(rt: string, ti: string) {
-    return `R${(CONST_ROUTES.findIndex((e) => e === rt) + 1).toString()}${(CONST_TIMES.findIndex((e) => e === ti) + 1).toString()}`
-  }
 
 }

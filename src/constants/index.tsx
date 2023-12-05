@@ -1,7 +1,11 @@
 
 export const CONST_ROUTES = ['Unassigned', 'Blue', 'Red', '3rd', 'Corporate']
 export const CONST_TIMES = ['9AM', '10AM', '11AM', 'Noon', '1PM', '2PM', '3PM', '4PM', '5PM']
+export const CONST_SCHED_TIMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11','12','13','14','15','16','17','18']
+export const CONST_QTY_SLOTS = 18;
+
 export const CONST_ROUTE_MAX = 3
+export const CONST_DEFAULT_ROUTE = 'Unassigned';
 
 export const routeLoadSize: any =
 // Number of slots per day Sun-Sat
