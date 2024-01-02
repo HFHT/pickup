@@ -32,7 +32,7 @@ export function useOpenAI() {
                 }
             ])
         }
-        catch (error) { console.log(error); alert('Read of ChatGPT failed: ' + error); }
+        catch (error) { console.log(error); alert('Read of ChatGPT failed, please try again later: ' + error); }
     }
 
     const resetGPT = (doIt: boolean) => {

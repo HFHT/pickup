@@ -42,7 +42,7 @@ export const fetchDB = ({ queryKey }: any): Promise<Group[]> => {
     fetch(`${baseURL}?req=${encodeURIComponent(JSON.stringify({ method: 'find', db: 'Truck', collection: db, find: find }))}`, { method: "GET", headers: new Headers() })
       .then(response => response.json())
       .then(data => { return data })
-      .catch(error => { console.log(error); alert('Could not get the Schedule from the Database.'); return [] })
+      .catch(error => { console.log(error); /*alert('Could not get the Schedule from the Database.');*/ return [] })
   )
 }
 

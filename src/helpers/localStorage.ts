@@ -15,6 +15,6 @@ export const setLocalStorage = (key: any, items: any) => {
     if (typeof window !== "undefined") {
         window.localStorage.setItem(key, JSON.stringify(items));
     } else {
-        alert('Local Storage not supported in your browser!')
+        console.log('Local Storage not supported in your browser! ')
     }
 }
