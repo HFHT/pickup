@@ -16,11 +16,11 @@ interface Iprod {
 }
 interface Iprods extends Array<Iprod> { }
 
-interface Iitem {
-  i: string;
-  t: string
-}
-interface Iitems extends Array<Iitem> { }
+// interface Itile {
+//   i: string;
+//   t: string
+// }
+// interface Itiles extends Array<Itile> { }
 
 interface IPlace {
   addr?: string;

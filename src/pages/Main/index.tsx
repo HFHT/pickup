@@ -117,13 +117,11 @@ export function Main({ sas, settings, id }: any) {
     setImgs(photoNames)
   }
   useEffect(() => {
-    if (!customer || customer.length < 2) return
+    if (!customer || customer.length === 0) return
     console.log(customer)
-    if (customer[1].length > 0) {
-      setName(customer[1][0].name)
-      setGooglePlace(customer[1][0].addr)
-      setAppt({ ...appt, email: customer[1][0].email, apt: customer[1][0].apt, note: customer[1][0].nt })
-    }
+    setName(customer[0].name)
+    setGooglePlace(customer[0].addr)
+    setAppt({ ...appt, email: customer[0].email, apt: customer[0].apt, note: customer[0].nt })
   }, [customer])
 
   function handleNav(direction: number) {

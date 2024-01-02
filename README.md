@@ -2,19 +2,23 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
+1) Check on close/refresh browser while changes havent' been saved.
+2) buildSlots - holidays and blocked routes.
+1) Need to handle when all unassigned slots are filled. Not sure if this can happen with current route maximum but if we add more trucks handling a zip code we could end up with more than 18 web adds.
+-- Possibly only look at the unassigned route when determining if there is space available. 
+-- Or create an overflow (waitlist) route and start assigning to it. 
+2) If no slots are available, message to contact the scheduler.
+3) On Thank you page, have a Done button that returns to the start page.
+4) Make image upload size smaller. Make the glamor photos smaller.
+5) Breadcrumbs - Number of items, number of photos
+6) Cookie to hold the customer object, check the cookie and autofill if it exists.
+7) Cancel - ask for reason. convenient date/time, accepted items, other
 Todo:
-Calculate the next cell for the Unassigned route.
 
-If no slots are available, message to contact the scheduler.
-On Thank you page, have a Done button that returns to the start page.
+
+
+
 Remove toast
-Make image upload size smaller.
-Make the glamor photos smaller.
-
-Breadcrumbs - Number of items, number of photos
-Cookie to hold the customer object, check the cookie and autofill if it exists.
-
-Cancel - ask for reason. convenient date/time, accepted items, other
 
 View as a calendar... future
 donor - have a total pickups and items {pickup: 5, items: 20}
@@ -24,5 +28,3 @@ Customer - hide client information until phone number check is done.
 Add spinners, on loading, on waiting for Shopify customer lookup, on Save.
 been taken'
 --- perhaps resubmit without the email, and/or notify the scheduler to resolve the discrepency.
-
-on mobile an accidental pulldown refreshes browser back to page, intercept it.

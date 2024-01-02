@@ -1,7 +1,6 @@
 import { ToastContainer, toast } from "react-toastify";
 import { Button } from "../../components/Button";
 import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from "react-accessible-accordion";
-import { TilesMulti } from "../../components/Tiles";
 import { useEffect, useState } from "react";
 import { OpenAI } from "../../components/OpenAI";
 interface IDonate {
@@ -85,37 +84,4 @@ export function Donations({ isOpen, donations, setDonations }: IDonate) {
             }
         </>
     )
-
-
-}
-
-interface IType {
-    products: Iitems
-    chosen: Iprods
-    hasCustom: string
-    customItems: any
-    customIdx: number
-    setCustomItems: Function
-    title?: string
-    onClick: Function
-}
-function DonateType({ products, title, chosen, hasCustom, customItems, customIdx, setCustomItems, onClick }: IType) {
-    const handleClick = (e: string, id: number, t: string, b: number) => {
-        console.log('DonateType', e, id)
-        onClick(e, id, products, t, b)
-    }
-
-    return (
-        <AccordionItem>
-            <AccordionItemHeading>
-                <AccordionItemButton>
-                    {title}
-                </AccordionItemButton>
-            </AccordionItemHeading>
-            <AccordionItemPanel>
-                <TilesMulti tiles={products} chosen={chosen} hasCustom={hasCustom} customItems={customItems} setCustomItems={(e: any) => setCustomItems(e)} customIdx={customIdx} onClick={(e: any, i: any, t: string, b: number) => handleClick(e, i, t, b)} />
-            </AccordionItemPanel>
-        </AccordionItem>
-    )
-
 }

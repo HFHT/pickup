@@ -2,6 +2,8 @@ import { dateFormat } from "./dateDB";
 import { fetchAPI, fetchDB } from "./fetchAPI";
 
 export async function shopifyCustSearch(phone: string) {
+    //lookup the phone number in Shopify and in the local db
+    //returns [theAddress from db or Shopify or null, Shopify customer record or null]
     if (!phone) return;
     console.log(phone)
     let options = {
@@ -13,7 +15,7 @@ export async function shopifyCustSearch(phone: string) {
         })
     };
 
-    const result = await Promise.all(
+    const result: any = await Promise.all(
         [
             fetchShopify(options),
             fetchAPI({
@@ -24,18 +26,50 @@ export async function shopifyCustSearch(phone: string) {
                 }
             })
         ])
-    console.log(result)
-    return result
+    console.log(result, result[0].customers, result[1])
+
+    if (result[1] && result[1].length > 0) {                  // There is an address in local db
+        return [result[1][0], null]
+    }
+    switch (result[0].customers.length) {
+        case 0:                                             // Phone number not in Shopify
+            return [null, null]
+        case 1:                                             // One customer record for this phone number
+            return [formatDonor(result[0].customers[0]), result[0].customers[0]]
+        default:                                            // More than one, find the best one.
+            let hasAddr = result[0].customers.filter((rcd: any) => {
+                return rcd.addresses.length > 0
+            })
+            console.log(hasAddr)
+            return [formatDonor(hasAddr[0]), hasAddr[0]]
+    }
+    function formatDonor(shopifyCust: any) {
+        let streetParts = shopifyCust.default_address.address1.split(' ')
+        let streetNum = streetParts.splice(0, 1)
+        return {
+            _id: shopifyCust.phone, apt: '', dt: dateFormat(null), email: shopifyCust.email, nt: '',
+            name: { first: shopifyCust.first_name, last: shopifyCust.last_name },
+            addr: {
+                addr: shopifyCust.default_address.address1,
+                lat: 0,
+                lng: 0,
+                num: streetNum,
+                route: streetParts.join(' '),
+                city: shopifyCust.default_address.city,
+                state: shopifyCust.default_address.province_code,
+                c_cd: shopifyCust.default_address.country_code,
+                c_nm: shopifyCust.default_address.country_name,
+                zip: shopifyCust.default_address.zip
+            }
+        }
+    }
 }
 
 export async function shopifyCustAdd(customer: any, appt: any) {
-    // customer[0] is fetch results from Shopify, customer[1] is fetch results from Donor DB
-    // if customer[0] is set then do an Update to Shopify, otherwise do a Create
-    // if customer[1] is set then do nothing, otherwise do a create
-
+    // customer[1] has Shopify customer info, if null then need to create, otherwise update
     console.log(customer, appt)
-    if (customer.length < 2) return
-    let options = haveCustomer(customer) ? buildShopifyUpdate(customer[0], appt) : buildShopifyAdd(appt)
+    if (!customer || customer.length === 0) return
+    let options = haveCustomer(customer) ? buildShopifyUpdate(customer[1], appt) : buildShopifyAdd(appt)
     console.log(options)
     // handle where email is already taken by another record.
 
@@ -78,7 +112,7 @@ async function fetchShopify(o: any) {
     }
 }
 function haveCustomer(c: any) {
-    return c[0].customers.length > 0
+    return c[1] !== null
 }
 function buildShopifyAdd(appt: ISched) {
     return {
@@ -123,15 +157,15 @@ function itemsToList(theItems: any) {
 }
 
 function buildShopifyUpdate(customer: any, appt: ISched) {
-    console.log(customer, customer.customers[0])
+    console.log(customer)
     let ci: any = {}
-    ci.id = customer.customers[0].id
-    ci.note = `${customer.customers[0].note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}`
-    ci.tags = buildTags(customer.customers[0].tags)
-    if (!customer.customers[0].email) ci.email = appt.appt.email
-    if (!customer.customers[0].last_name) ci.last_name = appt.name.last
-    if (!customer.customers[0].first_name) ci.first_name = appt.name.first
-    if (customer.customers[0].addresses.length === 0) {
+    ci.id = customer.id
+    ci.note = `${customer.note && customer.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}`
+    ci.tags = buildTags(customer.tags)
+    if (!customer.email) ci.email = appt.appt.email
+    if (!customer.last_name) ci.last_name = appt.name.last
+    if (!customer.first_name) ci.first_name = appt.name.first
+    if (customer.addresses.length === 0) {
         ci.addresses = [
             {
                 "address1": `${appt.place.num} ${appt.place.route}`,
@@ -152,7 +186,7 @@ function buildShopifyUpdate(customer: any, appt: ISched) {
         body: JSON.stringify({
             method: 'updateCust',
             product: {
-                handle: customer.customers[0].id,
+                handle: customer.id,
                 body: JSON.stringify({
                     "customer": ci
                 })
