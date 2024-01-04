@@ -41,22 +41,27 @@ interface IScheds {
   c: [ISched]
 }
 interface ISched {
-  id: string;
-  dt: string;
+  id: string
+  dt: string
+  idx?: number
   name: {
-    first: string;
-    last: string;
+      first: string
+      last: string
   };
-  phone: string;
-  zip: string;
-  place: IPlace;
+  phone: string
+  zip: string
+  place: IPlace
   appt: IAppt
+  items: Iitem[];
   imgs: string[]
-  items: any;
-  src: null | '' | 'w' | 's' | 'o';
-  call?: string;
-  done?: boolean;
-  resched?: boolean;
+  src: null | '' | 'w' | 's' | 'o' | 'd' | 'x' // w-web, s-scheduler, d-delivery, x - block slot
+  call?: string
+  done?: boolean
+  resched?: boolean
+  note?: string
+  calls: Icall[]
+  waitlist?: string
+  full?: boolean
 }
 interface IAppt {
   id: string;

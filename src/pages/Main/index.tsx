@@ -18,6 +18,7 @@ import { Input } from '../../components/Input';
 import { find_row } from '../../helpers/find_id';
 import { Donations } from '../Donations';
 import { findFirstSlot } from '../../helpers/findFirstSlot';
+import useExitPrompt from '../../hooks/useExitPrompt';
 
 export function Main({ sas, settings, id }: any) {
   const [zip, setZip] = useState('')
@@ -27,6 +28,8 @@ export function Main({ sas, settings, id }: any) {
   const [submit, setSubmit] = useState(false)
   const [cancelled, setCancelled] = useState(false)
   const [donationList, setDonationList] = useState([])
+  const [donationInput, setDonationInput] = useState('')
+
   const [name, setName] = useState({ first: '', last: '' })
   const [phone, setPhone] = useState('')
   const [imgs, setImgs] = useState<string[]>([])
@@ -35,11 +38,12 @@ export function Main({ sas, settings, id }: any) {
   const [maxPage, setMaxPage] = useState(0)
   const [customItems, setCustomItems] = useState([])
 
-  const [appt, setAppt] = useState<IAppt>({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '9AM', cell: '' })
+  const [appt, setAppt] = useState<IAppt>({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
   const [dbEntry, setDBEntry] = useState<ISched | null>(null)
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
 
   const [dbSched, addNew, update] = useDbSched()
 
@@ -58,7 +62,25 @@ export function Main({ sas, settings, id }: any) {
         console.log(theseDonations)
         if (d !== undefined && d !== '') { theseDonations.push({ prod: d, qty: 0 }) }
       })
-      setDBEntry({ id: id, name: name, phone: phone, zip: zip, place: googlePlace, appt: { ...e, time: findFirstSlot(dbSched,sched) }, dt: dateFormat(null), items: theseDonations, imgs: imgs, src: 'w' })
+      setDBEntry(
+        {
+          id: id,
+          name: name,
+          phone: phone,
+          zip: zip,
+          place: googlePlace,
+          appt: { ...e, time: findFirstSlot(dbSched, sched) },
+          dt: dateFormat(null),
+          src: 'w',
+          calls: [],
+          items: theseDonations,
+          imgs: imgs,
+          note: '',
+          waitlist: '',
+          done: false,
+          resched: false
+        }
+      )
     } else {
       setCancelled(true)
       setCurPage(6)
@@ -79,16 +101,19 @@ export function Main({ sas, settings, id }: any) {
     setPhone('')
     setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, apt: '', note: '', email: '', slot: '', rt: 'u', time: '', cell: '' })
+    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
     setDBEntry(null)
     setZip('')
     setCurPage(5)
     setDonationList([])
     setCustomItems([])
+    setDonationInput('')
+    setShowExitPrompt(false)
   }
 
   async function handleBack() {
-    console.log('handleBack')
+    console.log('handleBack', curPage)
+    if (curPage > 0) handleNav(-1)
     return false
   }
   function handlePhoneLookup() {
@@ -133,6 +158,7 @@ export function Main({ sas, settings, id }: any) {
     }
   }
   function handleNext(thePage: number) {
+    setShowExitPrompt(true)
     setCurPage(thePage);
     thePage > maxPage && setMaxPage(thePage)
   }
@@ -149,10 +175,15 @@ export function Main({ sas, settings, id }: any) {
     setName({ first: '', last: '' })
     setPhone('')
     setImgs([])
-    setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'u', time: '', cell: '' })
+    setGooglePlace({})
+    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
     setDBEntry(null)
     setZip('')
+    setSubmit(false)
+    setCancelled(false)
+    setDonationInput('')
+    setShowExitPrompt(false)
+
   }
   return (
     <>
@@ -164,7 +195,10 @@ export function Main({ sas, settings, id }: any) {
 
           <ZipList isOpen={curPage === 0} availSlots={availSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={sched} setSched={(e: any) => { handleNext(1); setSched(e) }} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={curPage === 1} setUnderstood={() => handleNext(2)} />
-          <Donations isOpen={curPage === 2} donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }} />
+          <Donations isOpen={curPage === 2}
+            donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }}
+            donationInput={donationInput} setDonationInput={(e: any) => setDonationInput(e)}
+          />
           <Photos isOpen={curPage === 3} setHavePhotos={setHavePhotos} setPhotos={(e: any) => { handleNext(4); setPhotos(e) }} />
           <Customer
             id={id}
@@ -181,7 +215,7 @@ export function Main({ sas, settings, id }: any) {
             setHaveCustomer={(e: any) => { handleNext(5); handleCustomer(e) }}
           />
           <Confirm isOpen={curPage === 5} dbEntry={dbEntry} setSubmit={() => handleSubmit()} />
-          <Saved isOpen={submit} />
+          <Saved isOpen={submit} onClick={() => handleCancel()} />
           <Cancelled isOpen={cancelled} onClick={() => handleCancel()} />
         </>
       }
@@ -240,20 +274,21 @@ function Photos({ isOpen, setHavePhotos, setPhotos }: any) {
   }
   return <>
     {isOpen &&
-      <div>
-        <Button onClick={() => handleClick()}> Done </Button>
+      <div className='photodiv'>
         <DragDropFile images={images} title='Please send us a photo of your items.' setImages={setImages} />
+        <Button onClick={() => handleClick()}> Done </Button>
       </div>}
 
   </>
 }
 
-function Saved({ isOpen }: any) {
+function Saved({ isOpen, onClick }: any) {
   return (
     <>
       {isOpen && <>
         <h3>Thank you for your donation. </h3>
         <blockquote>Proceeds generated from the HabiStore support Habitat Tucson's mission to build more affordable homes locally.</blockquote>
+        <Button onClick={() => onClick()}>Done</Button>
         <div className='savedimage'></div>
       </>}
     </>
@@ -320,7 +355,7 @@ function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }:
   return (<>
     {isOpen && availSlots &&
       <>
-        <Input type={'number'} value={zip} title={'Please enter your zip code'} onChange={(e: string) => setZip(e)} />
+        <Input type={'number'} value={zip} title={'Your zip code'} onChange={(e: string) => setZip(e)} />
         <div className={`${zipOpen() ? 'zipopen' : 'zipclosed'} zipmenu`}>
           {zipOpen() && (zipFound() ? 'Available Pickup Dates:' : 'Not in our Service Area')}
           {zipOpen() && zipFound() ?

@@ -10,9 +10,10 @@ interface ITile {
     disable: boolean
     userData: string
     setResult: Function
+    tryAgain: Function
 }
 
-export const OpenAI = ({ isOpen, disable, userData, setResult }: ITile) => {
+export const OpenAI = ({ isOpen, disable, userData, setResult, tryAgain }: ITile) => {
     const [isChat, setIsChat] = useState(false)
     const [itemList, getGPT, noResponse, resetGPT]: any = useOpenAI()
 
@@ -36,7 +37,7 @@ export const OpenAI = ({ isOpen, disable, userData, setResult }: ITile) => {
         console.log(theItem)
         let resp = CONST_acceptedProducts.find((ti: any) => (
             (ti.i).toUpperCase() === theItem.toUpperCase()) || ((`${ti.i}s`).toUpperCase() === theItem.toUpperCase()))?.t
-        console.log(resp)            
+        console.log(resp)
         return resp ? `- ${resp}` : null
     }
 
@@ -44,17 +45,12 @@ export const OpenAI = ({ isOpen, disable, userData, setResult }: ITile) => {
         <div className='aimain'>
             {isOpen &&
                 <>
-
-                    <div className='aicontrols'>
-                        <Button onClick={() => getOpenAI()} disabled={disable} classes='aibutton'>Update</Button>
-                        <Button onClick={() => handleAccept()} disabled={noResponse} classes='aibutton'>&nbsp;&nbsp;Confirm&nbsp;</Button>
-                    </div>
                     <div className="aitext">
                         {noResponse ?
                             <div>I did not understand your list. Please make sure it has a quantity along with the item.</div>
                             :
                             <>
-                                <div>Here is what I think you are donating:<br /><br /></div>
+                                <h4>Please confirm that this list is correct:</h4>
                                 <div className='airesults'>
                                     {
                                         itemList && itemList.length > 0 && itemList.map((ti: any, k: number) => (
@@ -64,6 +60,13 @@ export const OpenAI = ({ isOpen, disable, userData, setResult }: ITile) => {
                                 </div>
                             </>
                         }
+                    </div>
+                    <div className='aicontrols'>
+                        <Button onClick={() => tryAgain() /*getOpenAI()*/} disabled={disable} classes='aibutton'>Update</Button>
+                        <Button onClick={() => handleAccept()} disabled={noResponse} classes='aibutton'>&nbsp;&nbsp;Confirm&nbsp;</Button>
+                    </div>
+                    <div>
+                        {!noResponse && <small>If the list is not correct, please press UPDATE and then update your list of items and quantities.</small>}
                     </div>
                 </>
             }

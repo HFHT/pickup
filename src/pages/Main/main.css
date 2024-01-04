@@ -106,7 +106,12 @@
   cursor: pointer;
 
 }
-
+.photodiv {
+  margin-top: 0.8em;
+}
+.pickupgrid {
+  margin-top: 0.8em;
+}
 .breadcrumb {
   font-size: smaller
 }

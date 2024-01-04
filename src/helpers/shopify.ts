@@ -1,3 +1,4 @@
+import { CONST_SHOPIFY_TAG } from "../constants";
 import { dateFormat } from "./dateDB";
 import { fetchAPI, fetchDB } from "./fetchAPI";
 
@@ -28,21 +29,40 @@ export async function shopifyCustSearch(phone: string) {
         ])
     console.log(result, result[0].customers, result[1])
 
-    if (result[1] && result[1].length > 0) {                  // There is an address in local db
-        return [result[1][0], null]
+    return [hasLocalEntry(result), hasShopifyEntry(result)]
+
+    function hasLocalEntry(thisResult: any) {
+        if (thisResult[1] && thisResult[1].length > 0) {                  // There is an address in local db
+            return thisResult[1][0]
+        }
+        switch (thisResult[0].customers.length) {
+            case 0:                                             // Phone number not in Shopify
+                return null
+            case 1:                                             // One customer record for this phone number
+                return formatDonor(thisResult[0].customers[0])
+            default:                                            // More than one, find the best one.
+                let hasAddr = thisResult[0].customers.filter((rcd: any) => {
+                    return rcd.addresses.length > 0
+                })
+                console.log(hasAddr)
+                return formatDonor(hasAddr[0])
+        }
     }
-    switch (result[0].customers.length) {
-        case 0:                                             // Phone number not in Shopify
-            return [null, null]
-        case 1:                                             // One customer record for this phone number
-            return [formatDonor(result[0].customers[0]), result[0].customers[0]]
-        default:                                            // More than one, find the best one.
-            let hasAddr = result[0].customers.filter((rcd: any) => {
-                return rcd.addresses.length > 0
-            })
-            console.log(hasAddr)
-            return [formatDonor(hasAddr[0]), hasAddr[0]]
+    function hasShopifyEntry(thisResult: any) {
+        switch (thisResult[0].customers.length) {
+            case 0:                                             // Phone number not in Shopify
+                return null
+            case 1:                                             // One customer record for this phone number
+                return thisResult[0].customers[0]
+            default:                                            // More than one, find the best one.
+                let hasAddr = thisResult[0].customers.filter((rcd: any) => {
+                    return rcd.addresses.length > 0
+                })
+                console.log(hasAddr)
+                return hasAddr[0]
+        }
     }
+
     function formatDonor(shopifyCust: any) {
         let streetParts = shopifyCust.default_address.address1.split(' ')
         let streetNum = streetParts.splice(0, 1)
@@ -53,7 +73,7 @@ export async function shopifyCustSearch(phone: string) {
                 addr: shopifyCust.default_address.address1,
                 lat: 0,
                 lng: 0,
-                num: streetNum,
+                num: streetNum[0],
                 route: streetParts.join(' '),
                 city: shopifyCust.default_address.city,
                 state: shopifyCust.default_address.province_code,
@@ -67,10 +87,10 @@ export async function shopifyCustSearch(phone: string) {
 
 export async function shopifyCustAdd(customer: any, appt: any) {
     // customer[1] has Shopify customer info, if null then need to create, otherwise update
-    console.log(customer, appt)
+    console.log('shopifyCustAdd', customer, appt)
     if (!customer || customer.length === 0) return
     let options = haveCustomer(customer) ? buildShopifyUpdate(customer[1], appt) : buildShopifyAdd(appt)
-    console.log(options)
+    console.log('shopifyCustAdd-options', options)
     // handle where email is already taken by another record.
 
     const result = await Promise.all(
@@ -93,28 +113,30 @@ export async function shopifyCustAdd(customer: any, appt: any) {
                 }
             })
         ])
-    console.log(result)
+    console.log('shopifyCustAdd-result', result)
 }
 
 async function fetchShopify(o: any) {
     try {
         const response = await fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTShopify`, o);
-        console.log(response);
+        console.log('fetchShopify', response);
         if (!response.ok) throw `Shopify Item failed with ${response.status}: ${response.statusText}`
         const shopifyResponse = (await response.json());
-        console.log(shopifyResponse);
+        console.log('fetchShopify', shopifyResponse);
         if (shopifyResponse.hasOwnProperty('theProduct')) {
             return shopifyResponse.theProduct.data
         } else return []
     } catch (error) {
-        console.log(error)
+        console.log('fetchShopify', error)
         return []
     }
 }
 function haveCustomer(c: any) {
+    console.log('haverCustomer', c, c[1])
     return c[1] !== null
 }
 function buildShopifyAdd(appt: ISched) {
+    console.log('buildShopifyAdd', appt)
     return {
         method: "POST",
         headers: new Headers(),
@@ -127,8 +149,8 @@ function buildShopifyAdd(appt: ISched) {
                     "email": appt.appt.email,
                     "phone": appt.phone,  // +15142546011
                     "verified_email": false,
-                    "note": `${dateFormat(null)} donated: ${itemsToList(appt.items)}`,
-                    "tags": 'Pickup',
+                    "note": `${appt.note && appt.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}. `,
+                    "tags": `${CONST_SHOPIFY_TAG}`,
                     "addresses": [
                         {
                             "address1": `${appt.place.num} ${appt.place.route}`,
@@ -155,13 +177,12 @@ function itemsToList(theItems: any) {
         ti.qty === 0 ? `${ti.prod}` : `${ti.prod}(${ti.qty})`
     ))
 }
-
 function buildShopifyUpdate(customer: any, appt: ISched) {
-    console.log(customer)
+    console.log('buildShopifyUpdate', customer, appt)
     let ci: any = {}
     ci.id = customer.id
-    ci.note = `${customer.note && customer.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}`
-    ci.tags = buildTags(customer.tags)
+    ci.note = `${customer.note && customer.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}. `
+    ci.tags = `${CONST_SHOPIFY_TAG}` /*buildTags(customer.tags)*/
     if (!customer.email) ci.email = appt.appt.email
     if (!customer.last_name) ci.last_name = appt.name.last
     if (!customer.first_name) ci.first_name = appt.name.first

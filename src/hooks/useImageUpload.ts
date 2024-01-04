@@ -24,7 +24,7 @@ export function useImageUpload() {
             blockBlobClient.uploadData(reader.result)
                 .then(() => setImageDone(`${sas.url}/habistorepickup/${name}`))
                 .catch((e) => {
-                    alert(e);
+                    //alert(e);
                     setImageErr({ hasError: true, errDesc: e });
                 })
                 .finally(() => { });

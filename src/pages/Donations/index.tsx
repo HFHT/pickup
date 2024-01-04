@@ -7,9 +7,10 @@ interface IDonate {
     isOpen: boolean
     donations: any
     setDonations: Function
+    donationInput: any
+    setDonationInput: Function
 }
-export function Donations({ isOpen, donations, setDonations }: IDonate) {
-    const [donationInput, setDonationInput] = useState('')
+export function Donations({ isOpen, donations, setDonations,donationInput, setDonationInput }: IDonate) {
     const [doOpenAI, setDoOpenAI] = useState(false)
     const notify = (t: string) => {
         console.log(t);
@@ -62,6 +63,9 @@ export function Donations({ isOpen, donations, setDonations }: IDonate) {
 
     }
 
+    function tryAgain() {
+
+    }
     useEffect(() => {
         console.log('Donations-useEffect', doOpenAI, donationInput)
         if (doOpenAI && donationInput.length === 0) setDoOpenAI(false)
@@ -71,14 +75,19 @@ export function Donations({ isOpen, donations, setDonations }: IDonate) {
         <>
             {isOpen &&
                 <>
-                    <h4>Provide a list of the items and the quantity of each item, for instance:<br />1 table, 4 chairs</h4>
-                    <div className='donateinput'>
-                        <div><textarea value={donationInput} placeholder='1 table, 4 chairs...' className='canceltext' spellCheck rows={5} cols={40} onChange={(e) => { setDonationInput(e.target.value) }} title='Enter a list of items and quantities that you wish to donate.' /></div>
-                        {/* <Button onClick={(e: any) => handleClear(e)}>Reset</Button> */}
-                        {!doOpenAI && <div><Button disabled={donationInput.length === 0} onClick={() => setDoOpenAI(true)}>Done</Button></div>}
-                    </div>
+                    {!doOpenAI &&
+                        <>
+                            <h4>Provide a list of the items and the quantity of each item, for instance: 1 table, 4 chairs</h4>
+                            <div className='donateinput'>
+                                <div><textarea value={donationInput} placeholder='1 table, 4 chairs...' className='canceltext' spellCheck rows={5} cols={40} onChange={(e) => { setDonationInput(e.target.value) }} title='Enter a list of items and quantities that you wish to donate.' /></div>
+                                {/* <Button onClick={(e: any) => handleClear(e)}>Reset</Button> */}
+                                {!doOpenAI && <div><Button disabled={donationInput.length === 0} onClick={() => setDoOpenAI(true)}>Done</Button></div>}
+                            </div>
+                        </>
+                    }
                     <ToastContainer position="top-left" className='mytoast' autoClose={3000} hideProgressBar={true} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
                     <OpenAI isOpen={doOpenAI} disable={false} userData={donationInput}
+                        tryAgain={() => setDoOpenAI(false)}
                         setResult={(e: any) => setDonations(e)} />
                 </>
             }
