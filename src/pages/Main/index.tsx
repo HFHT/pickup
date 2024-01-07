@@ -216,6 +216,8 @@ export function Main({ sas, settings, id }: any) {
             isOpen={curPage === 4}
             name={name}
             phone={phone}
+            email={email}
+            custInfo={custInfo}
             lookupDone={lookupDone}
             place={googlePlace}
             setPlace={(e: any) => setGooglePlace(e)}
