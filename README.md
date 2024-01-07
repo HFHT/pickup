@@ -3,6 +3,7 @@
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
 0) cancel save the reason 
+0) test the interaction between pickup, scheduler, and driver
 
 1) Need to handle when all unassigned slots are filled. Not sure if this can happen with current route maximum but if we add more trucks handling a zip code we could end up with more than 18 web adds.
 -- Possibly only look at the unassigned route when determining if there is space available. 

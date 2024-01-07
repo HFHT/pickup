@@ -49,6 +49,8 @@ interface ISched {
       last: string
   };
   phone: string
+  email: string
+  cust: ICustInfo 
   zip: string
   place: IPlace
   appt: IAppt
@@ -63,11 +65,15 @@ interface ISched {
   waitlist?: string
   full?: boolean
 }
+interface ICustInfo {
+  apt: string
+  note: string
+}
 interface IAppt {
   id: string;
-  apt: string;
-  note: string;
-  email: string;
+  // apt: string;
+  // note: string;
+  // email: string;
   slot: string;
   rt: string;
   time: string;

@@ -32,13 +32,16 @@ export function Main({ sas, settings, id }: any) {
 
   const [name, setName] = useState({ first: '', last: '' })
   const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [custInfo, setCustInfo] = useState({ apt: '', note: '' })
+
   const [imgs, setImgs] = useState<string[]>([])
   const [googlePlace, setGooglePlace] = useState<IPlace>({})
   const [curPage, setCurPage] = useState(0)
   const [maxPage, setMaxPage] = useState(0)
   const [customItems, setCustomItems] = useState([])
 
-  const [appt, setAppt] = useState<IAppt>({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
+  const [appt, setAppt] = useState<IAppt>({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
   const [dbEntry, setDBEntry] = useState<ISched | null>(null)
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
@@ -67,6 +70,8 @@ export function Main({ sas, settings, id }: any) {
           id: id,
           name: name,
           phone: phone,
+          email: email,
+          cust: custInfo,
           zip: zip,
           place: googlePlace,
           appt: { ...e, time: findFirstSlot(dbSched, sched) },
@@ -99,9 +104,11 @@ export function Main({ sas, settings, id }: any) {
     setSched('')
     setName({ first: '', last: '' })
     setPhone('')
+    setEmail('')
+    setCustInfo({ apt: '', note: '' })
     setImgs([])
     setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
+    setAppt({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
     setDBEntry(null)
     setZip('')
     setCurPage(5)
@@ -146,7 +153,9 @@ export function Main({ sas, settings, id }: any) {
     console.log(customer)
     setName(customer[0].name)
     setGooglePlace(customer[0].addr)
-    setAppt({ ...appt, email: customer[0].email, apt: customer[0].apt, note: customer[0].nt })
+    setEmail(customer[0].email)
+    setCustInfo({ apt: customer[0].apt, note: customer[0].nt })
+    setAppt({ ...appt })
   }, [customer])
 
   function handleNav(direction: number) {
@@ -174,9 +183,11 @@ export function Main({ sas, settings, id }: any) {
     setSched('')
     setName({ first: '', last: '' })
     setPhone('')
+    setEmail('')
+    setCustInfo({ apt: '', note: '' })
     setImgs([])
     setGooglePlace({})
-    setAppt({ id: id, apt: '', note: '', email: '', slot: '1', rt: 'Unassigned', time: '1', cell: '' })
+    setAppt({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
     setDBEntry(null)
     setZip('')
     setSubmit(false)
