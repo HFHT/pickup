@@ -146,7 +146,7 @@ function buildShopifyAdd(appt: ISched) {
                 "customer": {
                     "first_name": appt.name.first,
                     "last_name": appt.name.last,
-                    "email": appt.appt.email,
+                    "email": appt.email,
                     "phone": appt.phone,  // +15142546011
                     "verified_email": false,
                     "note": `${appt.note && appt.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}. `,
@@ -154,7 +154,7 @@ function buildShopifyAdd(appt: ISched) {
                     "addresses": [
                         {
                             "address1": `${appt.place.num} ${appt.place.route}`,
-                            "address2": appt.appt.apt,
+                            "address2": appt.cust.apt,
                             "city": appt.place.city,
                             "province": appt.place.state,  // State
                             "phone": appt.phone,
@@ -183,7 +183,7 @@ function buildShopifyUpdate(customer: any, appt: ISched) {
     ci.id = customer.id
     ci.note = `${customer.note && customer.note} ${dateFormat(null)} donated: ${itemsToList(appt.items)}. `
     ci.tags = `${CONST_SHOPIFY_TAG}` /*buildTags(customer.tags)*/
-    if (!customer.email) ci.email = appt.appt.email
+    if (!customer.email) ci.email = appt.email
     if (!customer.last_name) ci.last_name = appt.name.last
     if (!customer.first_name) ci.first_name = appt.name.first
     if (customer.addresses.length === 0) {
