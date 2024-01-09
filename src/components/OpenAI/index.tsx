@@ -1,9 +1,9 @@
 import './openai.css';
 
 import { useEffect, useState } from "react"
-import { Button } from "../Button"
+import { Button } from ".."
 import { CONST_GPT_PROMPT, CONST_acceptedProducts } from '../../constants';
-import { useOpenAI } from '../../hooks/useOpenAI';
+import { useOpenAI } from '../../hooks';
 
 interface ITile {
     isOpen: boolean

@@ -2,6 +2,8 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
+00) send confirmation email
+
 0) cancel save the reason 
 0) test the interaction between pickup, scheduler, and driver
 

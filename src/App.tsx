@@ -1,13 +1,11 @@
+import './index.css';
 import ReactDOM from 'react-dom/client'
 import { Main } from './pages/Main'
 import { Error } from './pages/Error'
-
-import './index.css';
 import { PageLayout } from './components/PageLayout';
 import { QueryClient, QueryClientProvider, QueryErrorResetBoundary } from '@tanstack/react-query';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import { fetchAPI, fetchSAS } from './helpers/fetchAPI';
-import { uniqueBarCode } from './helpers/barCode';
+import { fetchAPI, fetchSAS, uniqueBarCode } from './helpers';
 
 const queryClient = new QueryClient();
 (async () => {

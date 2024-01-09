@@ -161,59 +161,6 @@
   top: 3rem !important;
 }
 
-/**
-* ----------------------------------------------
-* Accordion styles
-* ----------------------------------------------
-**/
-.accordion {
-  border: 1px solid var(--color-accordian-border);
-  border-radius: 2px;
-}
-
-.accordion__item+.accordion__item {
-  border-top: 1px solid var(--color-accordian-border);
-}
-
-.accordion__button {
-  background-color: var(--color-accordian-btn-bg);
-  color: var(--color-accordian-btn);
-  cursor: pointer;
-  padding: 18px;
-  width: 100%;
-  text-align: left;
-  border: none;
-}
-
-.accordion__button:hover {
-  background-color: var(--color-accordian-btn-hover);
-}
-
-.accordion__button:before {
-  display: inline-block;
-  content: '';
-  height: 10px;
-  width: 10px;
-  margin-right: 12px;
-  border-bottom: 2px solid currentColor;
-  border-right: 2px solid currentColor;
-  transform: rotate(-45deg);
-}
-
-.accordion__button[aria-expanded='true']::before,
-.accordion__button[aria-selected='true']::before {
-  transform: rotate(45deg);
-}
-
-[hidden] {
-  display: none;
-}
-
-.accordion__panel {
-  padding: 4px 6px 4px 6px;
-  animation: fadein 0.35s ease-in;
-}
-
 /* -------------------------------------------------- */
 /* ---------------- Animation part ------------------ */
 /* -------------------------------------------------- */

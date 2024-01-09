@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
 import { Autocomplete } from "../GoogleAutocomplete";
 import PhoneInput from "react-phone-input-2";
-import { Button } from "../Button";
-import { Input } from "../Input";
+import { Button, Input } from "..";
 
 interface ICust {
   id: string

@@ -1,8 +1,6 @@
 import { ToastContainer, toast } from "react-toastify";
-import { Button } from "../../components/Button";
-import { Accordion, AccordionItem, AccordionItemButton, AccordionItemHeading, AccordionItemPanel } from "react-accessible-accordion";
 import { useEffect, useState } from "react";
-import { OpenAI } from "../../components/OpenAI";
+import { Button, OpenAI } from "../../components";
 interface IDonate {
     isOpen: boolean
     donations: any

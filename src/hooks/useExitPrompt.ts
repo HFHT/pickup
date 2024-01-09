@@ -15,7 +15,7 @@ const initBeforeUnLoad = (showExitPrompt: boolean) => {
 };
 
 // Hook
-export default function useExitPrompt(bool: any) {
+export function useExitPrompt(bool: any) {
     const [showExitPrompt, setShowExitPrompt] = useState(bool);
 
     window.onload = function () {

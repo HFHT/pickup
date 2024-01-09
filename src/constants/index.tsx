@@ -3,6 +3,14 @@
 // export const CONST_TIMES = ['9AM', '10AM', '11AM', 'Noon', '1PM', '2PM', '3PM', '4PM', '5PM']
 // export const CONST_SCHED_TIMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11','12','13','14','15','16','17','18']
 // export const CONST_QTY_SLOTS = 18;
+
+export const CONST_EMAILS: any = {
+  confirmation:
+  {
+    subject: 'Confirmation of your HabiStore donation pickup.',
+    body: '<h3>Thank you for letting us handle the pickup of your donation!!</h3><p>Date: {DATE}, Time: {TIME}</p><p>{ADDRESS}</p><p>{NOTES}</p><p>Please make sure that you have removed all personal items from your donation.</p><p>If we have to enter your home, please ensure that your items are located in an easily accessible location with safe egress to the exit.</p><p> All donations are subject to denial upon arrival. Acceptance is at the discretion of the driver, check out the <a href="https://www.habitattucson.org/habistore/" target="_blank" style="background-color: rgb(255, 255, 255);"> Donation Guide</a> for more details.</p><p>If you have any questions or, need to cancel or reschedule, contact our Scheduler at <a href="mailto:habistore@habitattucson.org">habistore@habitattucson.org</a> or call <a href="tel:+15202305323">(520)230-5323</a>, please leave a voicemail and we will return your call within one business day.</p><p>Thank you for supporting the <a href="https://www.habitattucson.org" target="_blank" style="background-color: rgb(255, 255, 255);">Habitat for Humanity</a> mission of building strength, stability, and self-reliance through housing in Southern Arizona!</p><p>Like and follow us on <a href="https://www.facebook.com/HabiStoreTucson/" target="_blank" style="background-color: rgb(255, 255, 255);">Facebook</a> and <a href="https://www.instagram.com/habistoretucson/" target="_blank" style="background-color: rgb(255, 255, 255);">Instagram</a> for new updates and current inventory.</p>'
+  }
+}
 export const CONST_SHOPIFY_TAG = 'Pickup';
 export const CONST_ROUTE_MAX = 3
 export const CONST_DEFAULT_ROUTE = 'Unassigned';

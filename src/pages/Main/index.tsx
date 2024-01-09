@@ -1,24 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import './main.css';
-import { dateDayName, dateFormat } from '../../helpers/dateDB';
-import { buildSlots } from '../../helpers/buildSlots';
-import { Button } from '../../components/Button';
-import { Customer } from '../../components/Customer';
-import { useDbSched } from '../../hooks/useDbSched';
-import { usePhoneLookup } from '../../hooks/usePhoneLookup';
-import { usePhoneSave } from '../../hooks/usePhoneSave';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
-import { CONST_ROUTE_MAX } from '../../constants';
-import { useImageUpload } from '../../hooks/useImageUpload';
-import { DragDropFile, Iimg, Iimgs } from '../../components/DragDropFile';
-import { useHistoryBackTrap } from '../../hooks/useHistoryBack';
+import { CONST_EMAILS, CONST_ROUTE_MAX } from '../../constants';
 import { BadgeIcons } from '../../icons/BadgeIcons';
-import { Input } from '../../components/Input';
-import { find_row } from '../../helpers/find_id';
 import { Donations } from '../Donations';
-import { findFirstSlot } from '../../helpers/findFirstSlot';
-import useExitPrompt from '../../hooks/useExitPrompt';
+import { useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
+import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_row } from '../../helpers';
+import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
 
 export function Main({ sas, settings, id }: any) {
   const [zip, setZip] = useState('')
@@ -47,6 +36,8 @@ export function Main({ sas, settings, id }: any) {
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
   const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
+  const [sendEMail, noResponse] = useEmail(toast)
+
 
   const [dbSched, addNew, update] = useDbSched()
 
@@ -99,6 +90,7 @@ export function Main({ sas, settings, id }: any) {
     if (!dbEntry) return
     addNew({ _id: sched, c: [dbEntry] }, dbSched)
     doPhoneSave(customer, dbEntry)
+    sendEMail(name, googlePlace.addr, email, CONST_EMAILS.confirmation)
     setSaved(true)
     setSubmit(true)
     setSched('')
