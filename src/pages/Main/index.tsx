@@ -36,7 +36,7 @@ export function Main({ sas, settings, id }: any) {
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
   const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
-  const [sendEMail, noResponse] = useEmail(toast)
+  const [sendEMail] = useEmail(toast)
 
 
   const [dbSched, addNew, update] = useDbSched()
@@ -90,7 +90,7 @@ export function Main({ sas, settings, id }: any) {
     if (!dbEntry) return
     addNew({ _id: sched, c: [dbEntry] }, dbSched)
     doPhoneSave(customer, dbEntry)
-    sendEMail(name, googlePlace.addr, email, CONST_EMAILS.confirmation)
+    sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: sched, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
     setSaved(true)
     setSubmit(true)
     setSched('')
@@ -128,6 +128,7 @@ export function Main({ sas, settings, id }: any) {
     setPhone(p)
   }
   function handleCancel() {
+    location.href=location.href
     doReset()
   }
   function setPhotos(photos: Iimgs) {

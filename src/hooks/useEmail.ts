@@ -1,47 +1,88 @@
 //{to:'xyz@xyz.com', subject:'Hi', text:'Just saying hi', html: '<h1>Hi There!</h1>}
 
-import { useState } from "react";
-import { CONST_EMAILS } from "../constants";
-import { fetchAndSetAll } from "../helpers/fetchAndSetAll";
+import { CONST_IMAGE_EMAIL } from "../constants";
 
-
+export interface ISendMail {
+    email: IEmail,
+    list: Iitem[]
+    listAll: boolean
+    images?: string[] | undefined
+    template: {
+        subject: string
+        body: string
+    }
+}
+interface IEmail {
+    name: { first: string, last: string },
+    addr: string | undefined
+    note: { apt: string, note: string }
+    email: string
+    date: string
+    time: string
+}
 export function useEmail(toast: Function) {
-    const [noResponse, setNoResponse] = useState(true);
 
-
-    const sendEMail = async (name:{first:string, last:string}, addr: string | undefined, email: string, template: { subject: string, body: string }) => {
+    const sendEMail = async ({ email, list, listAll, images = [], template }: ISendMail) => {
         // if (!chatGPT) return;
         console.log('sendEmail', email, template)
         if (!email) return;
         const headers = new Headers();
-        return //TEMP!!!! wait till email domain is linked and then remove.
         const optionsDesc = {
             method: "POST",
             headers: headers,
             body: JSON.stringify({
-                to: email,
+                to: email.email,
                 subject: template.subject,
-                html: template.body,
+                html: formatTemplate({ email, list, listAll, images, template }),
                 text: ''
             })
         };
+        console.log('sendEmail', optionsDesc.body)
 
-        try {
-            fetchAndSetAll([
-                {
-                    url: `${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSendEmail`,
-                    init: optionsDesc,
-                    setter: checkNoResponse
-                }
-            ])
+        fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSendEmail`, optionsDesc)
+            .then(response => { console.log(response); })
+            .catch(error => { console.log(error); })
+    }
+
+    return [sendEMail] as const;
+
+    function formatTemplate({ email, list, listAll, images, template }: ISendMail) {
+        let theResult = template.body
+        theResult = theResult.replace(/{DATE}/g, email.date).replace(/{TIME}/g, email.time === '' ? 'noon-4PM' : email.time).replace(/{ADDRESS}/g, formatAddr(email)).replace(/{NOTES}/g, formatNote(email))
+        theResult = theResult.replace(/{LIST}/g, buildList(list, listAll))
+        theResult = theResult.replace(/{IMAGES}/g, buildImages(images))
+
+        return theResult
+    }
+    function formatNote(email: IEmail) {
+        return (email.note.note === '') ? '' : `Note: ${email.note.note}`
+    }
+    function formatAddr(email: IEmail) {
+        if (!email.addr || email.addr === '') return ''
+        if (email.note.apt !== '') return `${email.addr}  unit: ${email.note.apt}`
+        return email.addr
+    }
+    function buildList(theList: Iitem[], listAll: boolean) {
+        let retList = theList.length > 0 ? '<ul compact>' : ''
+        theList.forEach((theItem: Iitem) => {
+            if (listAll || theItem.c) {
+                retList = `${retList} <li>${theItem.qty}-${theItem.prod}</li>`
+            }
+        })
+        retList = `${retList} ${theList.length > 0 ? '</ul>' : ''}`
+        return retList
+    }
+    function buildImages(theImages: string[] | undefined) {
+        console.log(theImages)
+        let retImages = ''
+        if (theImages && theImages.length > 0) {
+            retImages = `${CONST_IMAGE_EMAIL} `
+            theImages.forEach((theImage: string) => {
+                retImages = `${retImages} <a href="${import.meta.env.VITE_STORAGEIMAGEURL}${theImage}" ><img src="${import.meta.env.VITE_STORAGEIMAGEURL}${theImage}" height="200px"/></a>`
+            })
         }
-        catch (error) { console.log(error); toast('Send of email failed: ' + error); }
+        return retImages
     }
-
-    const checkNoResponse = (resp: any) => {
-        setNoResponse(resp[0].prod === 'Item 1')
-    }
-
-    return [sendEMail, noResponse] as const;
-
 }
+
+

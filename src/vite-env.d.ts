@@ -62,8 +62,14 @@ interface ISched {
   resched?: boolean
   note?: string
   calls: Icall[]
+  remind?: boolean
   waitlist?: string
   full?: boolean
+}
+interface Iitem {
+  prod: string;
+  qty: number;
+  c?: boolean;
 }
 interface ICustInfo {
   apt: string
