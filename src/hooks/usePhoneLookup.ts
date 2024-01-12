@@ -13,7 +13,7 @@ export function usePhoneLookup() {
         const response = await shopifyCustSearch(phone)
         //result array[0] is array of Shopify customers (customers empty not found), array[1] is array (empty not found)
         console.log(response)
-        if (response && (response[0].addr.lat === 0)) {
+        if (response && response[0] && (response[0].addr.lat === 0)) {
             let location = null
             if (geocoder) {
                 location = await geocoder.geocode({ address: `${response[0].addr.addr}, ${response[0].addr.city}, ${response[0].addr.state},${response[0].addr.c_cd} ` }, function (result, status) {

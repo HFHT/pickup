@@ -35,7 +35,7 @@ interface IVal {
 }
 
 export function Input(
-    { type, value, inputMode, title, setter, onChange, onEmpty, error, defaultValue, autoFocus, disabled, enterKey, textOnly, required, autoComplete,
+    { type, value, inputMode, title, setter, onChange, onEmpty, error, defaultValue, autoFocus, disabled, enterKey = true, textOnly, required, autoComplete,
         isURL, isNumber, size, max, min, maxLength, minLength, spellCheck, classes
     }: IInput) {
 
@@ -57,7 +57,7 @@ export function Input(
         setSpanTitle((inputValue.length > 0 || type === 'date') ? displayTitle : '');
     }
     const handleEnter = (e: any) => {
-        // console.log('enter', enterKey);
+        console.log('enter', enterKey);
         if (enterKey) {
             setter && setter(theValue.value);
             setTheValue({ value: value, event: e });

@@ -142,7 +142,7 @@ export function Main({ sas, settings, id }: any) {
     setImgs(photoNames)
   }
   useEffect(() => {
-    if (!customer || customer.length === 0) return
+    if (!customer || !customer[0] || customer.length === 0) return
     console.log(customer)
     setName(customer[0].name)
     setGooglePlace(customer[0].addr)
@@ -208,16 +208,18 @@ export function Main({ sas, settings, id }: any) {
             id={id}
             isOpen={curPage === 4}
             name={name}
+            setName={(e: any) => setName(e)}
             phone={phone}
+            setPhone={(e: any) => handlePhone(e)}
             email={email}
+            setEmail={(e: any) => setEmail(e)}
             custInfo={custInfo}
+            setCustInfo={(e: any) => setCustInfo(e)}
             lookupDone={lookupDone}
             place={googlePlace}
             setPlace={(e: any) => setGooglePlace(e)}
             appt={appt}
             setAppt={(e: any) => setAppt(e)}
-            setName={(e: any) => setName(e)}
-            setPhone={(e: any) => handlePhone(e)}
             setHaveCustomer={(e: any) => { handleNext(5); handleCustomer(e) }}
           />
           <Confirm isOpen={curPage === 5} dbEntry={dbEntry} setSubmit={() => handleSubmit()} />

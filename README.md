@@ -2,6 +2,9 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
+00) enter in a new person, save btn doesn't light up, have to put cursor at phone field to make it active.
+
+
 0) cancel save the reason 
 0) test the interaction between pickup, scheduler, and driver
 
