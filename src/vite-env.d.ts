@@ -44,10 +44,7 @@ interface ISched {
   id: string
   dt: string
   idx?: number
-  name: {
-      first: string
-      last: string
-  };
+  name: IName
   phone: string
   email: string
   cust: ICustInfo 
@@ -65,6 +62,11 @@ interface ISched {
   remind?: boolean
   waitlist?: string
   full?: boolean
+}
+interface IName {
+  first: string
+  last: string
+  company?: string | undefined | null
 }
 interface Iitem {
   prod: string;

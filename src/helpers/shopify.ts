@@ -66,9 +66,14 @@ export async function shopifyCustSearch(phone: string) {
     function formatDonor(shopifyCust: any) {
         let streetParts = shopifyCust.default_address.address1.split(' ')
         let streetNum = streetParts.splice(0, 1)
+        console.log('formatDonor', shopifyCust)
         return {
             _id: shopifyCust.phone, apt: '', dt: dateFormat(null), email: shopifyCust.email, nt: '',
-            name: { first: shopifyCust.first_name, last: shopifyCust.last_name },
+            name: {
+                first: shopifyCust.first_name,
+                last: shopifyCust.last_name,
+                company: shopifyCust.default_address.company
+            },
             addr: {
                 addr: shopifyCust.default_address.address1,
                 lat: 0,
@@ -85,7 +90,7 @@ export async function shopifyCustSearch(phone: string) {
     }
 }
 
-export async function shopifyCustAdd(customer: any, appt: any) {
+export async function shopifyCustAdd(customer: any, appt: ISched) {
     // customer[1] has Shopify customer info, if null then need to create, otherwise update
     console.log('shopifyCustAdd', customer, appt)
     if (!customer || customer.length === 0) return
@@ -105,9 +110,9 @@ export async function shopifyCustAdd(customer: any, appt: any) {
                         _id: appt.phone,
                         name: appt.name,
                         addr: appt.place,
-                        apt: appt.appt.apt,
-                        nt: appt.appt.note,
-                        email: appt.appt.email,
+                        apt: appt.cust.apt,
+                        nt: appt.cust.note,
+                        email: appt.email,
                         dt: dateFormat(null)
                     }
                 }
@@ -128,6 +133,7 @@ async function fetchShopify(o: any) {
         } else return []
     } catch (error) {
         console.log('fetchShopify', error)
+        alert('There is a problem with the network, please try again later.')
         return []
     }
 }
@@ -161,6 +167,7 @@ function buildShopifyAdd(appt: ISched) {
                             "zip": appt.place.zip,
                             "last_name": appt.name.last,
                             "first_name": appt.name.first,
+                            "company": appt.name.company === undefined ? '' : appt.name.company,
                             "country": "US"
                         }
                     ],
@@ -186,20 +193,30 @@ function buildShopifyUpdate(customer: any, appt: ISched) {
     if (!customer.email) ci.email = appt.email
     if (!customer.last_name) ci.last_name = appt.name.last
     if (!customer.first_name) ci.first_name = appt.name.first
-    if (customer.addresses.length === 0) {
-        ci.addresses = [
-            {
-                "address1": `${appt.place.num} ${appt.place.route}`,
-                "city": appt.place.city,
-                "province": appt.place.state,  // State
-                "phone": appt.phone,
-                "zip": appt.place.zip,
-                "last_name": appt.name.last,
-                "first_name": appt.name.first,
-                "country": "US"
-            }
-        ]
+    ci.default_address = {
+        "address1": `${appt.place.num} ${appt.place.route}`,
+        "city": appt.place.city,
+        "province": appt.place.state,  // State
+        "phone": appt.phone,
+        "zip": appt.place.zip,
+        "last_name": appt.name.last,
+        "first_name": appt.name.first,
+        "company": appt.name.company === undefined ? '' : appt.name.company,
+        "country": "US"
     }
+    ci.addresses = [
+        {
+            "address1": `${appt.place.num} ${appt.place.route}`,
+            "city": appt.place.city,
+            "province": appt.place.state,  // State
+            "phone": appt.phone,
+            "zip": appt.place.zip,
+            "last_name": appt.name.last,
+            "first_name": appt.name.first,
+            "company": appt.name.company === undefined ? '' : appt.name.company,
+            "country": "US"
+        }
+    ]
 
     return {
         method: "POST",

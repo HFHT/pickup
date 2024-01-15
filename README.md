@@ -2,8 +2,8 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
-00) enter in a new person, save btn doesn't light up, have to put cursor at phone field to make it active.
-
+00) HFHTShopify and HFHTMongoAPI and HFHTSendEMail - replace Alerts with true error handling (consolidate all errors and put up a new page)
+00) Don't include tomorrow on the schedule.
 
 0) cancel save the reason 
 0) test the interaction between pickup, scheduler, and driver

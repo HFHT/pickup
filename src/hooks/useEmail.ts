@@ -26,6 +26,7 @@ export function useEmail(toast: Function) {
         // if (!chatGPT) return;
         console.log('sendEmail', email, template)
         if (!email) return;
+
         const headers = new Headers();
         const optionsDesc = {
             method: "POST",
@@ -40,7 +41,10 @@ export function useEmail(toast: Function) {
         console.log('sendEmail', optionsDesc.body)
 
         fetch(`${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTSendEmail`, optionsDesc)
-            .then(response => { console.log(response); })
+            .then(response => { 
+                console.log(response); 
+                !response.ok && alert('There is a problem with the network, confirmation email not sent. Please try again later.')
+            })
             .catch(error => { console.log(error); })
     }
 

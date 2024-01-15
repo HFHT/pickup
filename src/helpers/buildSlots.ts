@@ -25,8 +25,8 @@ export function buildSlots(db: any) {
   return [routeAvail]
 }
 function calcAvailDates(d: any, db: any) {
-  // Takes d.dow figures out the next real date, from tomorrow on, plus the five after that TRUCK_FUTURE_DAYS
-  var cd = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+  // Takes d.dow figures out the next real date, from day after tomorrow on
+  var cd = new Date(new Date().getTime() + 48 * 60 * 60 * 1000)
   // console.log(cd.toDateString(), cd.getDate(), d.dow, cd.getDay(), (7 + d.dow - cd.getDay()) % 7)
   let d1: any = cd.setDate(cd.getDate() + (7 + d.dow - cd.getDay()) % 7)
   // console.log(d1, new Date(d1).toDateString())

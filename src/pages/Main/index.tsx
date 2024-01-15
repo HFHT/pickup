@@ -19,7 +19,7 @@ export function Main({ sas, settings, id }: any) {
   const [donationList, setDonationList] = useState([])
   const [donationInput, setDonationInput] = useState('')
 
-  const [name, setName] = useState({ first: '', last: '' })
+  const [name, setName] = useState<IName>({ first: '', last: '', company: '' })
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [custInfo, setCustInfo] = useState({ apt: '', note: '' })
@@ -94,7 +94,7 @@ export function Main({ sas, settings, id }: any) {
     setSaved(true)
     setSubmit(true)
     setSched('')
-    setName({ first: '', last: '' })
+    setName({ first: '', last: '', company: '' })
     setPhone('')
     setEmail('')
     setCustInfo({ apt: '', note: '' })
@@ -128,7 +128,7 @@ export function Main({ sas, settings, id }: any) {
     setPhone(p)
   }
   function handleCancel() {
-    location.href=location.href
+    location.href = location.href
     doReset()
   }
   function setPhotos(photos: Iimgs) {
@@ -174,7 +174,7 @@ export function Main({ sas, settings, id }: any) {
     setCustomItems([])
     setHavePhotos(false)
     setSched('')
-    setName({ first: '', last: '' })
+    setName({ first: '', last: '', company: '' })
     setPhone('')
     setEmail('')
     setCustInfo({ apt: '', note: '' })

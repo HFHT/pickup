@@ -5,7 +5,7 @@ export function usePhoneSave() {
     const [theResult, setTheResult]:any = useState([])
     const [isLoading, setIsLoading] = useState(false)
 
-    const doPhoneSave = async (customer: any, appt:any) => {
+    const doPhoneSave = async (customer: any, appt:ISched) => {
         setIsLoading(true)
         console.log(customer, appt)
         const response = await shopifyCustAdd(customer, appt)

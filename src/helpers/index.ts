@@ -10,3 +10,4 @@ export * from './buildSchedule';
 export * from './buildSlots';
 export * from './shopify';
 export * from './findFirstSlot';
+export * from './nullOrUndefined';

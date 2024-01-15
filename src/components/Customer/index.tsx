@@ -2,11 +2,12 @@ import { useEffect, useState } from "react"
 import { Autocomplete } from "../GoogleAutocomplete";
 import PhoneInput from "react-phone-input-2";
 import { Button, Input } from "..";
+import { nullOrUndefined } from "../../helpers";
 
 interface ICust {
   id: string
   isOpen: boolean
-  name: { first: string, last: string }
+  name: IName
   setName: Function
   phone: string
   setPhone: Function
@@ -75,6 +76,7 @@ export function Customer({ id, isOpen, name, phone, email, setEmail, custInfo, s
                 {(!false) && <Autocomplete place={place} initValue={place.addr} setPlace={(e: any) => setPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
                 <Input type='text' value={name.first} inputMode={'text'} minLength={1} setter={(e: string) => setName({ ...name, first: e })} title='First Name' />
                 <Input type='text' value={name.last} inputMode={'text'} minLength={3} setter={(e: string) => setName({ ...name, last: e })} title='Last Name' />
+                <Input type='text' value={nullOrUndefined(name.company)} setter={(e: string) => setName({ ...name, company: e })} title='Company' />
                 <Input type='text' value={custInfo.apt} setter={(e: string) => setCustInfo({ ...custInfo, apt: e })} title='Unit / Apartment' />
                 <Input type='text' value={custInfo.note} setter={(e: string) => setCustInfo({ ...custInfo, note: e })} title='Gate Code / Notes...' />
                 <Input type='email' value={email} inputMode={'email'} setter={(e: string) => setEmail(e)} title='Email address...' />
