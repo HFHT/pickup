@@ -52,7 +52,7 @@ export function useEmail(toast: Function) {
 
     function formatTemplate({ email, list, listAll, images, template }: ISendMail) {
         let theResult = template.body
-        theResult = theResult.replace(/{DATE}/g, email.date).replace(/{TIME}/g, email.time === '' ? 'noon-4PM' : email.time).replace(/{ADDRESS}/g, formatAddr(email)).replace(/{NOTES}/g, formatNote(email))
+        theResult = theResult.replace(/{DATE}/g, email.date).replace(/{TIME}/g, email.time === '' ? '9AM-3PM' : email.time).replace(/{ADDRESS}/g, formatAddr(email)).replace(/{NOTES}/g, formatNote(email))
         theResult = theResult.replace(/{LIST}/g, buildList(list, listAll))
         theResult = theResult.replace(/{IMAGES}/g, buildImages(images))
 
