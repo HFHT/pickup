@@ -31,8 +31,8 @@ export const CONST_ROUTE: any = {
 export const routeLoadSize: any =
 // Number of slots per day Sun-Sat
 {
-  'Blue': [0, 0, 10, 10, 10, 10, 12],
-  'Red': [0, 0, 10, 10, 10, 10, 12],
+  'Blue': [0, 10, 10, 10, 10, 10, 0],
+  'Red': [0, 10, 10, 10, 10, 10, 0],
   '3rd': [0, 0, 6, 6, 6, 0, 0],
   'Corp': [0, 0, 0, 0, 0, 0, 0]
 }
