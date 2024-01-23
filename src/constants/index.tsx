@@ -65,7 +65,7 @@ export const routeZips: any =
   85735: [{ dow: 4, rt: ['Blue', 'Red'] }],
   85736: [{ dow: 4, rt: ['Blue', 'Red'] }],
   85737: [{ dow: 3, rt: ['Blue', 'Red'] }],
-  85739: [{ dow: 4, rt: ['Blue', 'Red'] }],
+  85739: [{ dow: 3, rt: ['Blue', 'Red'] }],
   85741: [{ dow: 2, rt: ['Blue', 'Red'] }, { dow: 3, rt: ['Blue', 'Red'] }],
   85742: [{ dow: 2, rt: ['Blue', 'Red'] }],
   85743: [{ dow: 2, rt: ['Blue', 'Red'] }],

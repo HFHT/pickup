@@ -2,11 +2,11 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
+00) Handle Apple HEIC file types, convert to jpg, 
 00) HFHTShopify and HFHTMongoAPI and HFHTSendEMail - replace Alerts with true error handling (consolidate all errors and put up a new page)
 00) Don't include tomorrow on the schedule.
 
 0) cancel save the reason 
-0) test the interaction between pickup, scheduler, and driver
 
 1) Need to handle when all unassigned slots are filled. Not sure if this can happen with current route maximum but if we add more trucks handling a zip code we could end up with more than 18 web adds.
 -- Possibly only look at the unassigned route when determining if there is space available. 
