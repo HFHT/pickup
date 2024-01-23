@@ -1,3 +1,6 @@
+import { CONST_NOTSUPPORTED_IMAGES, CONST_NOTSUPPORTED_IMG } from '../../constants';
+import { fileType } from '../../helpers';
+import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 import './dragdropfile.css';
 import { useState, useRef } from 'react';
 
@@ -98,7 +101,11 @@ export function DragDropFile({ images, setImages, title }: IDrag) {
                     images.map((image: any, idx) => (
                         <div className="image" key={idx}>
                             <span className="delete" onClick={() => deleteImage(idx)}>&times;</span>
-                            <img src={image.url} alt={image.name} />
+                            <img
+                                src={CONST_NOTSUPPORTED_IMAGES.includes(fileType(image.name)) ? CONST_NOTSUPPORTED_IMG :image.url}
+                                onError={(e) => handleBrokenImage(e)}
+                                alt={image.name}
+                            />
                         </div>
                     )
 

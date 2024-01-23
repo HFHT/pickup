@@ -8,6 +8,7 @@ import { Donations } from '../Donations';
 import { useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
 import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_row } from '../../helpers';
 import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
+import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 
 export function Main({ sas, settings, id }: any) {
   const [zip, setZip] = useState('')
@@ -261,7 +262,10 @@ function Confirm({ isOpen, dbEntry, setSubmit }: any) {
               {
                 dbEntry.imgs.map((img: any, k: number) => (
                   <div className="image" key={k}>
-                    <img key={k} title='item image' src={`${import.meta.env.VITE_STORAGEIMAGEURL}${img}`} />
+                    <img key={k} title='item image'
+                      src={`${import.meta.env.VITE_STORAGEIMAGEURL}${img}`}
+                      onError={(e) => handleBrokenImage(e)}
+                    />
                   </div>
                 ))}
             </div>

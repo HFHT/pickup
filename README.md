@@ -2,9 +2,12 @@
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 
-00) Handle Apple HEIC file types, convert to jpg, 
+00x) Handle Apple HEIC file types, show the grayed image icon.
+00x) Handle broken image
+00) Handle Apple HEIC, if Safari then allow them to be displayed otherwise show gray out. 
 00) HFHTShopify and HFHTMongoAPI and HFHTSendEMail - replace Alerts with true error handling (consolidate all errors and put up a new page)
 00) Don't include tomorrow on the schedule.
+00) Duplicate - Check if they are already scheduled for the selected day, if so then bring it back in.
 
 0) cancel save the reason 
 

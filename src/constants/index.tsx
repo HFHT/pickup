@@ -3,6 +3,9 @@
 // export const CONST_TIMES = ['9AM', '10AM', '11AM', 'Noon', '1PM', '2PM', '3PM', '4PM', '5PM']
 // export const CONST_SCHED_TIMES = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11','12','13','14','15','16','17','18']
 // export const CONST_QTY_SLOTS = 18;
+export const CONST_NOTSUPPORTED_IMAGES = ['']
+export const CONST_NOTSUPPORTED_IMG = 'https://hfhtdev.blob.core.windows.net/habistorepickup/invalidphoto.jpg'
+
 export const CONST_IMAGE_EMAIL: string = ''
 export const CONST_EMAILS: any = {
   confirmation:
@@ -98,8 +101,8 @@ const msg = {
   working: 'Must be in good working condition.',
   mirror: 'Must have a frame. We do not accept unframed or plate glass mirrors.'
 }
-  
-export const CONST_acceptedProducts = 
+
+export const CONST_acceptedProducts =
   [
     { i: 'Accessories', t: msg.pickup },
     { i: 'Misc', t: msg.pickup },
