@@ -1,5 +1,12 @@
 /// <reference types="vite/client" />
-
+interface IControls {
+  _id: string
+  blocks: IBlocks[]
+}
+interface IBlocks {
+  date: string
+  routes: string[]
+}
 interface ISlot {
   r: string;                  // Route 'Blue'
   s: number;                  // Stop on the route

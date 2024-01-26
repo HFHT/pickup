@@ -12,3 +12,4 @@ export * from './shopify';
 export * from './findFirstSlot';
 export * from './nullOrUndefined';
 export * from './fileHandler';
+export * from './buildDBEntry';

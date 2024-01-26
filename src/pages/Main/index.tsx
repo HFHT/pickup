@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_EMAILS, CONST_ROUTE_MAX } from '../../constants';
 import { BadgeIcons } from '../../icons/BadgeIcons';
 import { Donations } from '../Donations';
-import { useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
+import { useDb, useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
 import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_row } from '../../helpers';
 import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
 import { handleBrokenImage } from '../../helpers/handleBrokenImage';
@@ -41,8 +41,9 @@ export function Main({ sas, settings, id }: any) {
 
 
   const [dbSched, addNew, update] = useDbSched()
+  const [dbCntl, mutateCntl, updateCntl, cntlFetching] = useDb({ key: 'controls', theDB: 'Controls', interval: 4 })
 
-  const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched)[0] }, [dbSched])
+  const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched, dbCntl)[0] }, [dbSched, dbCntl, cntlFetching])
   useHistoryBackTrap(handleBack)
   const handleCustomer = (e: any) => {
     // Save the updated schedule, blank indicates that it is a Cancel

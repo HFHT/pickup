@@ -1,5 +1,6 @@
 export * from './usePhoneLookup';
 export * from './useDbSched';
+export * from './useDb';
 export * from './useExitPrompt';
 export * from './usePhoneSave';
 export * from './useEmail';
