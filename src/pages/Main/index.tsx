@@ -6,11 +6,11 @@ import { CONST_EMAILS, CONST_ROUTE_MAX } from '../../constants';
 import { BadgeIcons } from '../../icons/BadgeIcons';
 import { Donations } from '../Donations';
 import { useDb, useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
-import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_row } from '../../helpers';
+import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_id, find_row } from '../../helpers';
 import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
 import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 
-export function Main({ sas, settings, id }: any) {
+export function Main({ sas, clientInfo, settings, id }: any) {
   const [zip, setZip] = useState('')
   const [sched, setSched] = useState('')
   const [havePhotos, setHavePhotos] = useState(false)
@@ -42,9 +42,26 @@ export function Main({ sas, settings, id }: any) {
 
   const [dbSched, addNew, update] = useDbSched()
   const [dbCntl, mutateCntl, updateCntl, cntlFetching] = useDb({ key: 'controls', theDB: 'Controls', interval: 4 })
-
+  const [dbTrack, mutateTrack, updateTrack, trackFetching] = useDb({ key: 'track', theDB: 'DonorTracking', _id: clientInfo.fingerprint, interval: 40 })
   const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched, dbCntl)[0] }, [dbSched, dbCntl, cntlFetching])
   useHistoryBackTrap(handleBack)
+  useEffect(() => {
+    console.log('useEffect-dbTrack', dbTrack)
+    if (!dbTrack) return
+    if (dbTrack.length === 0) {
+      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '' }] }, dbTrack, true)
+    } else {
+      const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
+      let thisTrack = { ...dbTrack[0] }
+      console.log(dIdx)
+      if (dIdx === -1) {
+        thisTrack.sessions.push({ dt: dateFormat(null), step: 0, zip: '' })
+        console.log(thisTrack)
+        mutateTrack({ ...thisTrack }, dbTrack, false)
+      }
+    }
+  }, [dbTrack])
+
   const handleCustomer = (e: any) => {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleCustomer', e, appt, phone, sched)
@@ -82,8 +99,9 @@ export function Main({ sas, settings, id }: any) {
     } else {
       setCancelled(true)
       setCurPage(6)
+      doTrack('X', zip)
+
     }
-    // setCurPage(6)
   }
 
   const handleSubmit = () => {
@@ -110,12 +128,26 @@ export function Main({ sas, settings, id }: any) {
     setCustomItems([])
     setDonationInput('')
     setShowExitPrompt(false)
+    doTrack('C', zip)
   }
 
   async function handleBack() {
     console.log('handleBack', curPage)
     if (curPage > 0) handleNav(-1)
     return false
+  }
+  function doTrack(step: number | string, zip: string) {
+    const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
+    let thisTrack = { ...dbTrack[0] }
+    console.log(dIdx)
+    if (dIdx > -1) {
+      let sessions = { ...thisTrack.sessions[dIdx] }
+      sessions = { ...sessions, step: step.toString(), zip: zip }
+      thisTrack.sessions[dIdx] = { ...sessions }
+      console.log(thisTrack)
+      mutateTrack({ ...thisTrack }, dbTrack, false)
+    }
+
   }
   function handlePhoneLookup() {
     console.log('handlePhoneLookup')
@@ -129,8 +161,9 @@ export function Main({ sas, settings, id }: any) {
     }
     setPhone(p)
   }
-  function handleCancel() {
+  function handleCancel(code: string) {
     location.href = location.href
+    doTrack(code, zip)
     doReset()
   }
   function setPhotos(photos: Iimgs) {
@@ -165,13 +198,13 @@ export function Main({ sas, settings, id }: any) {
     setShowExitPrompt(true)
     setCurPage(thePage);
     thePage > maxPage && setMaxPage(thePage)
+    doTrack(thePage, zip)
   }
   function doReset() {
     console.log('Main doReset', sched)
     setCurPage(0)
     setMaxPage(0)
     setSaved(false)
-    setCancelled(false)
     setDonationList([])
     setCustomItems([])
     setHavePhotos(false)
@@ -225,8 +258,8 @@ export function Main({ sas, settings, id }: any) {
             setHaveCustomer={(e: any) => { handleNext(5); handleCustomer(e) }}
           />
           <Confirm isOpen={curPage === 5} dbEntry={dbEntry} setSubmit={() => handleSubmit()} />
-          <Saved isOpen={submit} onClick={() => handleCancel()} />
-          <Cancelled isOpen={cancelled} onClick={() => handleCancel()} />
+          <Saved isOpen={submit} onClick={() => handleCancel('C')} />
+          <Cancelled isOpen={cancelled} onClick={() => handleCancel('X')} />
         </>
       }
     </>

@@ -1,6 +1,11 @@
 # HabiStore Online Donation Pickup Scheduling Web App
 
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
+00) Cancel - ask for reason. convenient date/time, accepted items, other
+--x Fingerprint to DB (new fingerprint)
+--- When done, solicit feedback
+--- Cancel, solicit feedback
+--- Progress, save to a tracking DB (navigator information)
 
 00x) Handle Apple HEIC file types, show the grayed image icon.
 00x) Handle broken image

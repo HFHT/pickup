@@ -19,6 +19,7 @@ export const CONST_ROUTE_MAX = 3
 export const CONST_DEFAULT_ROUTE = 'Unassigned';
 export const CONST_QTY_ROUTES = 5;
 export const CONST_ROUTES = ['Unassigned', 'Blue', 'Red', '3rd', 'Corporate']
+export const CONST_CANCEL_ROUTE = 'Cancel';
 
 export const CONST_ROUTE: any = {
   Unassigned: { n: 'Unassigned', s: 'var(--color-dark-background)' },

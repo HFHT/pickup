@@ -1,4 +1,4 @@
-import { CONST_DEFAULT_ROUTE, CONST_QTY_ROUTES } from "../constants"
+import { CONST_CANCEL_ROUTE, CONST_DEFAULT_ROUTE, CONST_QTY_ROUTES } from "../constants"
 import { find_row } from "./find_id"
 
 export function buildSchedule(dt: string, routes: any, db: any): ISched[][] {
@@ -20,7 +20,9 @@ export function buildSchedule(dt: string, routes: any, db: any): ISched[][] {
       if (aryRouteOffset > -1) {
         thisSched[aryRouteOffset][thisApptTime ? thisApptTime - 1 : 0] = thisAppt;
       } else {
-        alert(`Invalid route in database, contact support. Day=${dt} Route=${thisAppt.appt.rt} Name=${thisAppt.name.first} ${thisAppt.name.last}`);
+        if (thisAppt.appt.rt !== CONST_CANCEL_ROUTE) {
+          alert(`Invalid route in database, contact support. Day=${dt} Route=${thisAppt.appt.rt} Name=${thisAppt.name.first} ${thisAppt.name.last}`)
+        }
       }
     })
   }
