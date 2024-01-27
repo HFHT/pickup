@@ -24,7 +24,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [custInfo, setCustInfo] = useState({ apt: '', note: '' })
-
+  const [reason, setReason] = useState('')
   const [imgs, setImgs] = useState<string[]>([])
   const [googlePlace, setGooglePlace] = useState<IPlace>({})
   const [curPage, setCurPage] = useState(0)
@@ -36,7 +36,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
-  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false, () => doTrack('R', zip, phone))
   const [sendEMail] = useEmail(toast)
 
 
@@ -44,28 +44,88 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   const [dbCntl, mutateCntl, updateCntl, cntlFetching] = useDb({ key: 'controls', theDB: 'Controls', interval: 4 })
   const [dbTrack, mutateTrack, updateTrack, trackFetching] = useDb({ key: 'track', theDB: 'DonorTracking', _id: clientInfo.fingerprint, interval: 40 })
   const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched, dbCntl)[0] }, [dbSched, dbCntl, cntlFetching])
+  const [prevTrack, setPrevTrack] = useState<{ dt: string, step: string, zip: string, phone: string } | null>()
   useHistoryBackTrap(handleBack)
   useEffect(() => {
-    console.log('useEffect-dbTrack', dbTrack)
+    console.log('useEffect-dbTrack', dbTrack, prevTrack)
     if (!dbTrack) return
-    if (dbTrack.length === 0) {
-      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '', phone: '' }] }, dbTrack, true)
-    } else {
+    if (dbTrack.length > 0 && dbTrack[0].hasOwnProperty('sessions')) {
+      //A log exists for this fingerprint
       const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
       let thisTrack = { ...dbTrack[0] }
-      console.log(dIdx)
+      console.log('useEffect-dbTrack-haslog', dIdx)
       if (dIdx === -1) {
+        //There are no logs for this date, create one.
         thisTrack.sessions.push({ dt: dateFormat(null), step: 0, zip: '', phone: '' })
+        console.log('useEffect-dbTrack-haslog-nodate', thisTrack)
+        mutateTrack({ ...thisTrack }, dbTrack, false)
+        setPrevTrack(null)
+      } else {
+        //A log exists
+        console.log('useEffect-dbTrack-haslog-hasdate', prevTrack, thisTrack.sessions[dIdx])
+        !prevTrack && setPrevTrack(thisTrack.sessions[dIdx])
+      }
+    } else {
+      //No log exists for this fingerprint
+      console.log('useEffect-dbTrack-nolog!')
+      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '', phone: '' }] }, dbTrack, true)
+      setPrevTrack(null)
+    }
+  }, [dbTrack])
+
+  // useEffect(() => {
+  //   if (dbTrack && !prevTrack) {
+  //     if (dbTrack.length > 0 && dbTrack[0].hasOwnProperty('sessions')) {
+  //       const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
+  //       let thisTrack = { ...dbTrack[0] }
+  //       if (dIdx > -1) {
+  //         setPrevTrack(thisTrack.sessions[dIdx])
+  //       } else {
+  //         setPrevTrack(null)
+  //       }
+  //     } else {
+  //       setPrevTrack(null)
+  //     }
+  //   }
+  // }, [dbTrack])
+  function doTrack(step: number | 'C' | 'R' | 'X', zip: string, phone: string, reason?: undefined | string) {
+    const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
+    let thisTrack = { ...dbTrack[0] }
+    if (dIdx > -1) {
+      let sessions = { ...thisTrack.sessions[dIdx] }
+      if (doTrackUpdate(step, sessions.step)) {
+        sessions = { ...sessions, step: step.toString(), zip: zip, phone: phone }
+        if (reason) {
+          sessions = { ...sessions, reason: reason }
+        }
+        thisTrack.sessions[dIdx] = { ...sessions }
         console.log(thisTrack)
         mutateTrack({ ...thisTrack }, dbTrack, false)
       }
     }
-  }, [dbTrack])
-
+    function doTrackUpdate(step: number | 'C' | 'R' | 'X', sessionStep: any) {
+      console.log('doTrackCheck', step, prevTrack, sessionStep)
+      if (!prevTrack) return true
+      if (prevTrack.step === 'C') return false
+      if (step === 'R' && (sessionStep === 'C' || sessionStep === 'X')) return false
+      const isItNotNumber = (v: any) => isNaN(v)
+      if (prevTrack.step === 'R' || prevTrack.step === 'X') {
+        if (isItNotNumber(step)) {
+          return true
+        } else {
+          if (Number(step) > 0) return true
+        }
+        return false
+      }
+      if (isItNotNumber(step)) return true
+      return Number(step) > Number(prevTrack.step)
+    }
+  }
   const handleCustomer = (e: any) => {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleCustomer', e, appt, phone, sched)
     if (e !== '' && appt) {
+      console.log('handleCustomer-save')
       if (googlePlace.zip !== zip) toast.warn('Your selected delivery zip code does not match the address you provided.')
       let theseDonations: any = []
       donationList.forEach((d: any) => {
@@ -97,10 +157,11 @@ export function Main({ sas, clientInfo, settings, id }: any) {
         }
       )
     } else {
+      console.log('handleCustomer-cancel')
       setCancelled(true)
       setCurPage(6)
       doTrack('X', zip, phone)
-
+      setShowExitPrompt(false)
     }
   }
 
@@ -108,6 +169,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleSubmit', appt, phone, sched)
     if (!dbEntry) return
+    doTrack('C', zip, phone)
     addNew({ _id: sched, c: [dbEntry] }, dbSched)
     doPhoneSave(customer, dbEntry)
     sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: sched, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
@@ -128,7 +190,6 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     setCustomItems([])
     setDonationInput('')
     setShowExitPrompt(false)
-    doTrack('C', zip, phone)
   }
 
   async function handleBack() {
@@ -136,19 +197,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     if (curPage > 0) handleNav(-1)
     return false
   }
-  function doTrack(step: number | string, zip: string, phone: string) {
-    const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
-    let thisTrack = { ...dbTrack[0] }
-    console.log(dIdx)
-    if (dIdx > -1) {
-      let sessions = { ...thisTrack.sessions[dIdx] }
-      sessions = { ...sessions, step: step.toString(), zip: zip, phone: phone }
-      thisTrack.sessions[dIdx] = { ...sessions }
-      console.log(thisTrack)
-      mutateTrack({ ...thisTrack }, dbTrack, false)
-    }
 
-  }
   function handlePhoneLookup() {
     console.log('handlePhoneLookup')
     // 
@@ -161,10 +210,10 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     }
     setPhone(p)
   }
-  function handleCancel(code: string) {
+  function handleCancel(code: 'C' | 'R' | 'X') {
     location.href = location.href
-    doTrack(code, zip, phone)
-    doReset()
+    // doTrack(code, zip, phone, reason)
+    // doReset()
   }
   function setPhotos(photos: Iimgs) {
     console.log(photos)
@@ -194,11 +243,11 @@ export function Main({ sas, clientInfo, settings, id }: any) {
       setCurPage(curPage + direction)
     }
   }
-  function handleNext(thePage: number) {
+  function handleNext(thePage: number, noTrack: boolean = false) {
     setShowExitPrompt(true)
     setCurPage(thePage);
     thePage > maxPage && setMaxPage(thePage)
-    doTrack(thePage, zip, phone)
+    !noTrack && doTrack(thePage, zip, phone)
   }
   function doReset() {
     console.log('Main doReset', sched)
@@ -255,11 +304,11 @@ export function Main({ sas, clientInfo, settings, id }: any) {
             setPlace={(e: any) => setGooglePlace(e)}
             appt={appt}
             setAppt={(e: any) => setAppt(e)}
-            setHaveCustomer={(e: any) => { handleNext(5); handleCustomer(e) }}
+            setHaveCustomer={(e: any) => { handleNext(5, e === ''); handleCustomer(e) }}
           />
           <Confirm isOpen={curPage === 5} dbEntry={dbEntry} setSubmit={() => handleSubmit()} />
           <Saved isOpen={submit} onClick={() => handleCancel('C')} />
-          <Cancelled isOpen={cancelled} onClick={() => handleCancel('X')} />
+          <Cancelled isOpen={cancelled} reason={reason} setReason={(e: any) => setReason(e)} onClick={() => handleCancel('X')} />
         </>
       }
     </>
@@ -341,13 +390,13 @@ function Saved({ isOpen, onClick }: any) {
   )
 }
 
-function Cancelled({ isOpen, onClick }: any) {
+function Cancelled({ isOpen, onClick, reason, setReason }: any) {
   return (
     <>
       {isOpen && <div className='canceldiv'>
         <h3>Thank you for thinking of us. </h3>
         <blockquote>Before you go, could you let us know why you cancelled your donation?</blockquote>
-        <textarea title='Reason' placeholder='Reason...' rows={4} cols={40} className='canceltext' spellCheck>
+        <textarea value={reason} title='Reason' placeholder='Reason...' rows={4} cols={40} className='canceltext' spellCheck onChange={(e) => { setReason(e.target.value) }}>
         </textarea>
         <Button onClick={() => onClick()}>Done</Button>
         <div className='cancelimage'></div>

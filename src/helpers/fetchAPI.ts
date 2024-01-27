@@ -75,7 +75,10 @@ export const updateDB = ({ item, insert, db }: any): Promise<Group> => {
     fetch(`${import.meta.env.VITE_MONGO_URL}`, header)
       .then(response => response.json())
       .then(data => { return data })
-      .catch(error => {console.log(error);alert('There is a problem with the network, please try again later.')})
+      .catch(error => {
+        console.log(error)
+        // alert('There is a problem with the network, please try again later.')
+      })
     //  if (!(dbData.hasOwnProperty('acknowledged') && dbData.acknowledged)) {    
   )
 }

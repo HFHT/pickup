@@ -65,7 +65,7 @@ export function Donations({ isOpen, donations, setDonations,donationInput, setDo
 
     }
     useEffect(() => {
-        console.log('Donations-useEffect', doOpenAI, donationInput)
+        // console.log('Donations-useEffect', doOpenAI, donationInput)
         if (doOpenAI && donationInput.length === 0) setDoOpenAI(false)
     }, [donationInput])
 

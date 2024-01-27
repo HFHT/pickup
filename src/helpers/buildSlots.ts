@@ -75,7 +75,7 @@ function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[]) {
     theBlocks.forEach((blockRoute:string, idx:number) => {
       blocked = blocked + routeLoadSize[blockRoute][dt.dow]
     })
-    console.log('!!!!', blocked, hasBlockedRoutes[0][hasBlockedRoutes[1]].routes)
+    // console.log('!!!!', blocked, hasBlockedRoutes[0][hasBlockedRoutes[1]].routes)
   }
   let ds: any = db.filter((td: any) => td._id.slice(0, 10) === cd)
   if (ds.length > 0) {

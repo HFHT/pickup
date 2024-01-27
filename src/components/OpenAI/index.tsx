@@ -19,7 +19,7 @@ export const OpenAI = ({ isOpen, disable, userData, setResult, tryAgain }: ITile
 
     useEffect(() => {
         if (isOpen && userData !== '') {
-            console.log('getOpenAI', userData)
+            console.log('getOpenAI-useEffect', userData)
             getGPT(buildPrompt())
         }
     }, [isOpen])
@@ -34,10 +34,10 @@ export const OpenAI = ({ isOpen, disable, userData, setResult, tryAgain }: ITile
         resetGPT(true)
     }
     function checkItems(theItem: any) {
-        console.log(theItem)
+        // console.log(theItem)
         let resp = CONST_acceptedProducts.find((ti: any) => (
             (ti.i).toUpperCase() === theItem.toUpperCase()) || ((`${ti.i}s`).toUpperCase() === theItem.toUpperCase()))?.t
-        console.log(resp)
+        // console.log(resp)
         return resp ? `- ${resp}` : null
     }
 
@@ -74,7 +74,7 @@ export const OpenAI = ({ isOpen, disable, userData, setResult, tryAgain }: ITile
     );
 
     function ResultRow({ r }: any) {
-        console.log(r)
+        // console.log(r)
         return (
             <div className='airdiv'>
                 <div className='airow'>
