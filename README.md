@@ -5,7 +5,8 @@ This is to be used by Tucson HabiStore's donors to schedule pickups of donated i
 --x Fingerprint to DB (new fingerprint)
 --- When done, solicit feedback
 --- Cancel, solicit feedback
---- Progress, save to a tracking DB (navigator information)
+--- capture phone number
+--x Progress, save to a tracking DB (navigator information)
 
 00x) Handle Apple HEIC file types, show the grayed image icon.
 00x) Handle broken image

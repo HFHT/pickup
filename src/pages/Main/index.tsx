@@ -49,13 +49,13 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     console.log('useEffect-dbTrack', dbTrack)
     if (!dbTrack) return
     if (dbTrack.length === 0) {
-      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '' }] }, dbTrack, true)
+      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '', phone: '' }] }, dbTrack, true)
     } else {
       const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
       let thisTrack = { ...dbTrack[0] }
       console.log(dIdx)
       if (dIdx === -1) {
-        thisTrack.sessions.push({ dt: dateFormat(null), step: 0, zip: '' })
+        thisTrack.sessions.push({ dt: dateFormat(null), step: 0, zip: '', phone: '' })
         console.log(thisTrack)
         mutateTrack({ ...thisTrack }, dbTrack, false)
       }
@@ -99,7 +99,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     } else {
       setCancelled(true)
       setCurPage(6)
-      doTrack('X', zip)
+      doTrack('X', zip, phone)
 
     }
   }
@@ -128,7 +128,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     setCustomItems([])
     setDonationInput('')
     setShowExitPrompt(false)
-    doTrack('C', zip)
+    doTrack('C', zip, phone)
   }
 
   async function handleBack() {
@@ -136,13 +136,13 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     if (curPage > 0) handleNav(-1)
     return false
   }
-  function doTrack(step: number | string, zip: string) {
+  function doTrack(step: number | string, zip: string, phone: string) {
     const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
     let thisTrack = { ...dbTrack[0] }
     console.log(dIdx)
     if (dIdx > -1) {
       let sessions = { ...thisTrack.sessions[dIdx] }
-      sessions = { ...sessions, step: step.toString(), zip: zip }
+      sessions = { ...sessions, step: step.toString(), zip: zip, phone: phone }
       thisTrack.sessions[dIdx] = { ...sessions }
       console.log(thisTrack)
       mutateTrack({ ...thisTrack }, dbTrack, false)
@@ -163,7 +163,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   }
   function handleCancel(code: string) {
     location.href = location.href
-    doTrack(code, zip)
+    doTrack(code, zip, phone)
     doReset()
   }
   function setPhotos(photos: Iimgs) {
@@ -198,7 +198,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     setShowExitPrompt(true)
     setCurPage(thePage);
     thePage > maxPage && setMaxPage(thePage)
-    doTrack(thePage, zip)
+    doTrack(thePage, zip, phone)
   }
   function doReset() {
     console.log('Main doReset', sched)
