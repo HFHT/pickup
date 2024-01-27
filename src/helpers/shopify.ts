@@ -133,7 +133,7 @@ async function fetchShopify(o: any) {
         } else return []
     } catch (error) {
         console.log('fetchShopify', error)
-        alert('There is a problem with the network, please try again later.')
+        //alert('There is a problem with the network, please try again later.')
         return []
     }
 }
