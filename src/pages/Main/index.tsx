@@ -153,7 +153,8 @@ export function Main({ sas, clientInfo, settings, id }: any) {
           note: '',
           waitlist: '',
           done: false,
-          resched: false
+          resched: false,
+          fingerprint: clientInfo.fingerprint
         }
       )
     } else {

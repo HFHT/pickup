@@ -55,7 +55,7 @@ export function useEmail(toast: Function) {
         theResult = theResult.replace(/{DATE}/g, email.date).replace(/{TIME}/g, email.time === '' ? '9AM-3PM' : email.time).replace(/{ADDRESS}/g, formatAddr(email)).replace(/{NOTES}/g, formatNote(email))
         theResult = theResult.replace(/{LIST}/g, buildList(list, listAll))
         theResult = theResult.replace(/{IMAGES}/g, buildImages(images))
-
+        theResult = theResult.replace(/{NAME}/g, `${email.name.first} ${email.name.last}`)
         return theResult
     }
     function formatNote(email: IEmail) {

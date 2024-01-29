@@ -54,7 +54,7 @@ interface ISched {
   name: IName
   phone: string
   email: string
-  cust: ICustInfo 
+  cust: ICustInfo
   zip: string
   place: IPlace
   appt: IAppt
@@ -69,6 +69,8 @@ interface ISched {
   remind?: boolean
   waitlist?: string
   full?: boolean
+  gpsStop?: string
+  fingerprint?: string
 }
 interface IName {
   first: string
