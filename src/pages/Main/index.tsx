@@ -5,12 +5,13 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_EMAILS, CONST_ROUTE_MAX } from '../../constants';
 import { BadgeIcons } from '../../icons/BadgeIcons';
 import { Donations } from '../Donations';
-import { useDb, useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, usePhoneLookup, usePhoneSave } from '../../hooks';
+import { useDb, useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, useParams, usePhoneLookup, usePhoneSave } from '../../hooks';
 import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_id, find_row } from '../../helpers';
 import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
 import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 
 export function Main({ sas, clientInfo, settings, id }: any) {
+  const params = useParams(['debug', 'notrack'])
   const [zip, setZip] = useState('')
   const [sched, setSched] = useState('')
   const [havePhotos, setHavePhotos] = useState(false)
@@ -36,7 +37,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
   const [customer1, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
-  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false, () => doTrack('R', zip, phone))
+  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
   const [sendEMail] = useEmail(toast)
 
 
@@ -73,22 +74,9 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     }
   }, [dbTrack])
 
-  // useEffect(() => {
-  //   if (dbTrack && !prevTrack) {
-  //     if (dbTrack.length > 0 && dbTrack[0].hasOwnProperty('sessions')) {
-  //       const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
-  //       let thisTrack = { ...dbTrack[0] }
-  //       if (dIdx > -1) {
-  //         setPrevTrack(thisTrack.sessions[dIdx])
-  //       } else {
-  //         setPrevTrack(null)
-  //       }
-  //     } else {
-  //       setPrevTrack(null)
-  //     }
-  //   }
-  // }, [dbTrack])
   function doTrack(step: number | 'C' | 'R' | 'X', zip: string, phone: string, reason?: undefined | string) {
+    console.log(params, params.notrack)
+    if (params.notrack !== null) return
     const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
     let thisTrack = { ...dbTrack[0] }
     if (dIdx > -1) {

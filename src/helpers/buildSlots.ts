@@ -1,5 +1,5 @@
 import { findBlockRoute } from "."
-import { routeLoadSize, routeZips } from "../constants"
+import { CONST_CANCEL_ROUTE, routeLoadSize, routeZips } from "../constants"
 import { dateAdjust, dateFormat } from "./dateDB"
 
 export function buildSlots(db: Idb, dbCntl: IControls[]) {
@@ -72,7 +72,7 @@ function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[]) {
   let blocked = 0
   if (hasBlockedRoutes[1] > -1) {
     const theBlocks = hasBlockedRoutes[0][hasBlockedRoutes[1]].routes
-    theBlocks.forEach((blockRoute:string, idx:number) => {
+    theBlocks.forEach((blockRoute: string, idx: number) => {
       blocked = blocked + routeLoadSize[blockRoute][dt.dow]
     })
     // console.log('!!!!', blocked, hasBlockedRoutes[0][hasBlockedRoutes[1]].routes)
@@ -83,7 +83,14 @@ function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[]) {
     let s = 0
     ds.forEach((m0: any) => {
       m0.c.forEach((m1: any) => {
-        m1.hasOwnProperty('appt') && m1.appt.hasOwnProperty('slot') && (s = s + Number(m1.appt.slot))
+        if (m1.hasOwnProperty('appt')) {
+          if (m1.appt.hasOwnProperty('slot')) {
+            if (m1.appt.rt !== CONST_CANCEL_ROUTE) {
+              s = s + Number(m1.appt.slot)
+            }
+          }
+        }
+        // m1.hasOwnProperty('appt') && m1.appt.hasOwnProperty('slot') && (s = s + Number(m1.appt.slot))
       })
     })
     return s + blocked

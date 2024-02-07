@@ -7,3 +7,4 @@ export * from './useEmail';
 export * from './useHistoryBack';
 export * from './useImageUpload';
 export * from './useOpenAI';
+export * from './useParams';
