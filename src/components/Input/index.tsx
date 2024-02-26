@@ -59,17 +59,17 @@ export function Input(
     const handleEnter = (e: any) => {
         console.log('enter', enterKey);
         if (enterKey) {
-            setter && setter(theValue.value);
+            (typeof setter !== 'undefined' ) && setter(theValue.value);
             setTheValue({ value: value, event: e });
         }
     }
     const handleBackspace = (e: any) => {
         // console.log(e.code, value)
-        if (value.toString().length === 0) onEmpty && onEmpty();
+        if (value.toString().length === 0) (typeof onEmpty !== 'undefined') && onEmpty();
     }
     const handleBlur = (e: any) => {
         // setter && errText === '' && setter(theValue.value)
-        setter && setter(theValue.value)
+        (typeof setter !== 'undefined' ) && setter(theValue.value)
     }
 
     useEffect(() => {

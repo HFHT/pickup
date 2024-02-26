@@ -11,7 +11,7 @@ import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../compon
 import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 
 export function Main({ sas, clientInfo, settings, id }: any) {
-  const params = useParams(['debug', 'notrack'])
+  const params = useParams(['debug', 'notrack', 'nosave']) // notrack: No entries in tracking db, nosave: no DB or Shopify updates
   const [zip, setZip] = useState('')
   const [sched, setSched] = useState('')
   const [havePhotos, setHavePhotos] = useState(false)
@@ -158,10 +158,12 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     // Save the updated schedule, blank indicates that it is a Cancel
     console.log('Main handleSubmit', appt, phone, sched)
     if (!dbEntry) return
-    doTrack('C', zip, phone)
-    addNew({ _id: sched, c: [dbEntry] }, dbSched)
-    doPhoneSave(customer, dbEntry)
-    sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: sched, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
+    if (params.nosave === null) {
+      doTrack('C', zip, phone)
+      addNew({ _id: sched, c: [dbEntry] }, dbSched)
+      doPhoneSave(customer, dbEntry)
+      sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: sched, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
+    }
     setSaved(true)
     setSubmit(true)
     setSched('')

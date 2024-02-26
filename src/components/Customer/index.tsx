@@ -74,12 +74,12 @@ export function Customer({ id, isOpen, name, phone, email, setEmail, custInfo, s
               <>
                 <h3>Contact information...</h3>
                 {(!false) && <Autocomplete place={place} initValue={place.addr} setPlace={(e: any) => setPlace(e)} setHavePlace={(e: any) => console.log(e)} />}
-                <Input type='text' value={name.first} inputMode={'text'} minLength={1} setter={(e: string) => setName({ ...name, first: e })} title='First Name' />
-                <Input type='text' value={name.last} inputMode={'text'} minLength={3} setter={(e: string) => setName({ ...name, last: e })} title='Last Name' />
+                <Input type='text' value={name.first} inputMode={'text'} minLength={1} onChange={(e: string) => setName({ ...name, first: e })} title='First Name' />
+                <Input type='text' value={name.last} inputMode={'text'} minLength={3} onChange={(e: string) => setName({ ...name, last: e })} title='Last Name' />
                 <Input type='text' value={nullOrUndefined(name.company)} setter={(e: string) => setName({ ...name, company: e })} title='Company' />
                 <Input type='text' value={custInfo.apt} setter={(e: string) => setCustInfo({ ...custInfo, apt: e })} title='Unit / Apartment' />
                 <Input type='text' value={custInfo.note} setter={(e: string) => setCustInfo({ ...custInfo, note: e })} title='Gate Code / Notes...' />
-                <Input type='email' value={email} inputMode={'email'} setter={(e: string) => setEmail(e)} title='Email address...' />
+                <Input type='email' value={email} inputMode={'email'} onChange={(e: string) => setEmail(e)} title='Email address...' />
               </>
               :
               <div className='customerimage'><h2 className='ziptext'>Proceeds fund Habitat for Humanity Tucson in building affordable homes in Tucson & Southern Arizona.</h2></div>
