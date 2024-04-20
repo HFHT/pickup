@@ -43,8 +43,9 @@ export function Main({ sas, clientInfo, settings, id }: any) {
 
   const [dbSched, addNew, update] = useDbSched()
   const [dbCntl, mutateCntl, updateCntl, cntlFetching] = useDb({ key: 'controls', theDB: 'Controls', interval: 4 })
+  const [dbSettings] = useDb({ key: 'settings', theDB: 'Settings', interval: 0 })
   const [dbTrack, mutateTrack, updateTrack, trackFetching] = useDb({ key: 'track', theDB: 'DonorTracking', _id: clientInfo.fingerprint, interval: 40 })
-  const availSlots: any = useMemo(() => { console.log('useMemo'); return buildSlots(dbSched, dbCntl)[0] }, [dbSched, dbCntl, cntlFetching])
+  const zipAvailSlots = useMemo(() => { /*console.log('useMemoNew-slots', dbSched, dbSettings);*/ return buildSlots(dbSched, dbCntl, find_row('_id', 'routes', dbSettings), 'pickup')[0] }, [dbSched, dbCntl, cntlFetching])
   const [prevTrack, setPrevTrack] = useState<{ dt: string, step: string, zip: string, phone: string } | null>()
   useHistoryBackTrap(handleBack)
   useEffect(() => {
@@ -272,7 +273,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
           {/* <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={curPage < maxPage} /> */}
           <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={false} />
 
-          <ZipList isOpen={curPage === 0} availSlots={availSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={sched} setSched={(e: any) => { handleNext(1); setSched(e) }} setZip={(e: string) => setZip(e)} />
+          <ZipList isOpen={curPage === 0} availSlots={zipAvailSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={sched} setSched={(e: any) => { handleNext(1); setSched(e) }} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={curPage === 1} setUnderstood={() => handleNext(2)} />
           <Donations isOpen={curPage === 2}
             donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }}

@@ -101,3 +101,8 @@ interface IEdit {
   id?: string;
   src?: string;
 }
+interface DBRoutes {
+  _id: 'routes'
+  trucks: any,
+  routes: any
+}

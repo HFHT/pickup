@@ -1,56 +1,46 @@
-import { findBlockRoute } from "."
-import { CONST_CANCEL_ROUTE, routeLoadSize, routeZips } from "../constants"
-import { dateAdjust, dateFormat } from "./dateDB"
+import { dateAdjust, dateFormat, findBlockRoute } from "."
+import { CONST_CANCEL_ROUTE, CONST_QTY_SLOTS } from "../constants"
 
-export function buildSlots(db: Idb, dbCntl: IControls[]) {
-  //dbSched.data.slots = r:route, s:stop, n:# of slots, c:customer idx, d:done, x:cancelled
-  if (!db || !dbCntl) { return [] }
-  const routes: ISlots = [
-    { r: 'Blue', s: 4, n: 2, c: 1, d: false, x: false }
-  ]
-  // console.log('buildSlots', routeZips)
+export function buildSlots(db: Idb, dbCntl: IControls[], dbSettings: DBRoutes, type: 'pickup' | 'delivery') {
+
+  if (!db || !dbCntl || !dbSettings) { return [] }
   //Builds the routeAvail array 
   //[{85614: [{ dt: '10/23/23', t: 10, u: 4 }, { dt: '10/30/23', t: 10, u: 2 }]}]
   //For each zip, build next 6 day of week dates, total the number of slots for that day, 
   //then total the number of used slots from DBSched
   //!!!! Future, add truck for each date 
   let routeAvail = {}
-  Object.keys(routeZips).forEach(function (key, i) {
-    let availDate = routeZips[key].map((thisDate: any) => {
-      return calcAvailDates(thisDate, db, dbCntl)
-    })
-    let availMerge: any = mergeAvail(availDate)
-    routeAvail = { ...routeAvail, [key]: availMerge }
+  Object.keys(dbSettings.routes).forEach(function (key, i) {
+    try {
+      let availDate = dbSettings.routes[key].map((thisRouteZip: { dow: number, rt: string[] }) => {
+        return calcAvailDates(thisRouteZip, db, dbCntl, dbSettings.trucks, type)
+      })
+      let availMerge: any = mergeAvail(availDate)
+      routeAvail = { ...routeAvail, [key]: availMerge }
+    }
+    catch (e) {
+      throw ({ msg: `Contact Support, build slots error. Key: ${key}, Number: ${i}`, e: e })
+    }
   })
-  // console.log(routeAvail)
   return [routeAvail]
 }
-function calcAvailDates(dt: any, db: Idb, dbCntl: IControls[]) {
-  // Takes d.dow figures out the next real date, from day after tomorrow on
-  var cd = new Date(new Date().getTime() + 48 * 60 * 60 * 1000)
-  // console.log(cd.toDateString(), cd.getDate(), d.dow, cd.getDay(), (7 + d.dow - cd.getDay()) % 7)
-  let d1: any = cd.setDate(cd.getDate() + (7 + dt.dow - cd.getDay()) % 7)
-  // console.log(d1, new Date(d1).toDateString())
+function calcAvailDates(rz: { dow: number, rt: string[] }, db: Idb, dbCntl: IControls[], trucks: any[], type: string) {
+  // Takes d.dow figures out the next real date, from tomorrow on, plus the five after that TRUCK_FUTURE_DAYS
+  var cd = new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+  let d1: any = cd.setDate(cd.getDate() + (7 + rz.dow - cd.getDay()) % 7)
   d1 = dateFormat(d1)
 
-  // console.log(d1)
-  const ns = sumSlots(dt)
+  // Sum the slots
+  const ns = rz.rt.map((rt: any) => trucks[rt][type].loadsize[rz.dow]).reduce((tot: any, cur: any) => tot + cur)
   return [
-    { d: d1, t: ns, u: calcUsed(d1, dt, db, dbCntl) },
-    { d: dateAdjust(d1, 7), t: ns, u: calcUsed(dateAdjust(d1, 7), dt, db, dbCntl) },
-    { d: dateAdjust(d1, 14), t: ns, u: calcUsed(dateAdjust(d1, 14), dt, db, dbCntl) },
-    { d: dateAdjust(d1, 21), t: ns, u: calcUsed(dateAdjust(d1, 21), dt, db, dbCntl) },
-    { d: dateAdjust(d1, 28), t: ns, u: calcUsed(dateAdjust(d1, 28), dt, db, dbCntl) }
+    { d: d1, t: ns, u: calcUsed(d1, rz, db, dbCntl, trucks, type) },
+    { d: dateAdjust(d1, 7), t: ns, u: calcUsed(dateAdjust(d1, 7), rz, db, dbCntl, trucks, type) },
+    { d: dateAdjust(d1, 14), t: ns, u: calcUsed(dateAdjust(d1, 14), rz, db, dbCntl, trucks, type) },
+    { d: dateAdjust(d1, 21), t: ns, u: calcUsed(dateAdjust(d1, 21), rz, db, dbCntl, trucks, type) },
+    { d: dateAdjust(d1, 28), t: ns, u: calcUsed(dateAdjust(d1, 28), rz, db, dbCntl, trucks, type) }
   ]
 }
-function sumSlots(d: any) {
-  // Takes d.rt and sums the available slots for d.dow 
-  return d.rt.map((rt: any) => sumDow(rt, d.dow)).reduce((tot: any, cur: any) => tot + cur)
-}
-function sumDow(r: any, dw: any) {
-  const rt = routeLoadSize[r]
-  return rt[dw]
-}
+
 function mergeAvail(da: any) {
   let m: any = []
   da.forEach((dsa: any) => {
@@ -65,18 +55,18 @@ function mergeAvail(da: any) {
   })
   return m
 }
-function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[]) {
+function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[], trucks: any[], type: string) {
   // Look through all the schedDB.data for any slots that are taken for that day and return a total used
-  //dbSched.data.slots = r:route, s:stop, n:# of slots, c:customer idx, d:done, x:cancelled
   const hasBlockedRoutes = findBlockRoute(cd, dbCntl)
   let blocked = 0
   if (hasBlockedRoutes[1] > -1) {
     const theBlocks = hasBlockedRoutes[0][hasBlockedRoutes[1]].routes
     theBlocks.forEach((blockRoute: string, idx: number) => {
-      blocked = blocked + routeLoadSize[blockRoute][dt.dow]
+      //@ts-ignore
+      blocked = blocked + trucks[blockRoute][type].loadsize[dt.dow]
     })
-    // console.log('!!!!', blocked, hasBlockedRoutes[0][hasBlockedRoutes[1]].routes)
   }
+  const validSrc = (type === 'delivery') ? ['d'] : ['w', 's']
   let ds: any = db.filter((td: any) => td._id.slice(0, 10) === cd)
   if (ds.length > 0) {
     //Sum all the slots
@@ -85,15 +75,36 @@ function calcUsed(cd: any, dt: any, db: Idb, dbCntl: IControls[]) {
       m0.c.forEach((m1: any) => {
         if (m1.hasOwnProperty('appt')) {
           if (m1.appt.hasOwnProperty('slot')) {
-            if (m1.appt.rt !== CONST_CANCEL_ROUTE) {
+            if ((m1.appt.rt !== CONST_CANCEL_ROUTE) && (validSrc.includes(m1.src))) {
               s = s + Number(m1.appt.slot)
             }
           }
         }
-        // m1.hasOwnProperty('appt') && m1.appt.hasOwnProperty('slot') && (s = s + Number(m1.appt.slot))
       })
     })
     return s + blocked
   }
   return 0
+}
+
+export function slotControls(schedule: ISched[]) {
+  let theSlots: boolean[] = []
+  if (!schedule) {
+    return []
+  }
+  for (let j = 0; j < CONST_QTY_SLOTS; j++) {
+    theSlots.push(false);
+  }
+  schedule.forEach((thisAppt, i: number) => {
+    let startSlot = Number(thisAppt.appt.time) - 1
+    const numSlots = Number(thisAppt.appt.slot)
+    for (let j = startSlot; j < startSlot + numSlots; j++) {
+      theSlots[j] = true
+    }
+  })
+  return theSlots
+}
+
+export function usedSlots(route: ISched[]) {
+  return route.length > 0 ? route.reduce((acc: number, obj: ISched) => { return acc + Number(obj.appt.slot) }, 0) : 0
 }

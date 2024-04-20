@@ -12,7 +12,7 @@ interface IuseDB {
 //useDb({key:'schedule', theDB: 'Schedule', _id: null, interval:4})
 export function useDb({ key, theDB, _id = null, interval = 4 }: IuseDB) {
     const [isFetching, setIsFetching] = useState(false)
-    const retDB: any = useQuery<any>({ queryKey: [key, theDB, _id], queryFn: fetchDB, refetchInterval: 1000 * 60 * interval }).data
+    const { data: retDB, refetch }: any = useQuery<any>({ queryKey: [key, theDB, _id], queryFn: fetchDB, refetchInterval: 1000 * 60 * interval })
     const queryClient = useQueryClient();
 
     const updateItems = useMutation<any, any, { item: any, db: string, insert: boolean }>(
@@ -71,5 +71,5 @@ export function useDb({ key, theDB, _id = null, interval = 4 }: IuseDB) {
         return
     }
 
-    return [retDB, doMutation, update, isFetching] as const;
+    return [retDB, doMutation, update, isFetching, refetch] as const;
 }
