@@ -5,15 +5,19 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import { CONST_EMAILS, CONST_ROUTE_MAX } from '../../constants';
 import { BadgeIcons } from '../../icons/BadgeIcons';
 import { Donations } from '../Donations';
-import { useDb, useDbSched, useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, useParams, usePhoneLookup, usePhoneSave } from '../../hooks';
+import { useEmail, useExitPrompt, useHistoryBackTrap, useImageUpload, useMongo, useParams, usePhoneLookup, usePhoneSave, useSaveStop, useTrackBrowser } from '../../hooks';
 import { buildSlots, dateDayName, dateFormat, findFirstSlot, find_id, find_row } from '../../helpers';
 import { Button, Customer, DragDropFile, Iimg, Iimgs, Input } from '../../components';
 import { handleBrokenImage } from '../../helpers/handleBrokenImage';
 
-export function Main({ sas, clientInfo, settings, id }: any) {
+export function Main({ sas, clientInfo, schedule, settings, session, controls, id }: any) {
   const params = useParams(['debug', 'notrack', 'nosave']) // notrack: No entries in tracking db, nosave: no DB or Shopify updates
+
+  const [_tracking, set_Tracking] = useState(session)
+  const [_formFields, set_FormFields] = useState<ISched | null>(null)
+
   const [zip, setZip] = useState('')
-  const [sched, setSched] = useState('')
+  const [schedDate, setSchedDate] = useState('')
   const [havePhotos, setHavePhotos] = useState(false)
   const [saved, setSaved] = useState(false)
   const [submit, setSubmit] = useState(false)
@@ -33,86 +37,23 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   const [customItems, setCustomItems] = useState([])
 
   const [appt, setAppt] = useState<IAppt>({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
-  const [dbEntry, setDBEntry] = useState<ISched | null>(null)
   const [customer, doPhoneLookup, isLookupLoading, lookupDone] = usePhoneLookup()
-  const [customer1, doPhoneSave, isSaving] = usePhoneSave()
+  const [, doPhoneSave, isSaving] = usePhoneSave()
   const [upLoadFile] = useImageUpload();
-  const [showExitPrompt, setShowExitPrompt] = useExitPrompt(false)
+  const [, setShowExitPrompt] = useExitPrompt(false)
   const [sendEMail] = useEmail(toast)
 
+  const [, updateSchedule, isFetching] = useMongo({ connection: { url: import.meta.env.VITE_MONGO_URL, collection: 'Schedule', key: '_id' }, setter: () => { console.log('fetched') }, noSave: params.nosave })
+  const [, updateTrack, isTracking] = useMongo({ connection: { url: import.meta.env.VITE_MONGO_URL, collection: 'DonorTracking', key: '_id', find: { _id: clientInfo.fingerprint } }, setter: set_Tracking, noSave: params.nosave })
+  const [doSaveStop, hasError, isSaving1] = useSaveStop(schedDate, updateSchedule, toast)
+  const [doTrack] = useTrackBrowser({ browserSession: _tracking, clientInfo: clientInfo, dt: dateFormat(null), setter: updateTrack, notrack: params.notrack })
 
-  const [dbSched, addNew, update] = useDbSched()
-  const [dbCntl, mutateCntl, updateCntl, cntlFetching] = useDb({ key: 'controls', theDB: 'Controls', interval: 4 })
-  const [dbSettings] = useDb({ key: 'settings', theDB: 'Settings', interval: 0 })
-  const [dbTrack, mutateTrack, updateTrack, trackFetching] = useDb({ key: 'track', theDB: 'DonorTracking', _id: clientInfo.fingerprint, interval: 40 })
-  const zipAvailSlots = useMemo(() => { /*console.log('useMemoNew-slots', dbSched, dbSettings);*/ return buildSlots(dbSched, dbCntl, find_row('_id', 'routes', dbSettings), 'pickup')[0] }, [dbSched, dbCntl, cntlFetching])
-  const [prevTrack, setPrevTrack] = useState<{ dt: string, step: string, zip: string, phone: string } | null>()
+  const zipAvailSlots = useMemo(() => { /*console.log('useMemoNew-slots', dbSched, dbSettings);*/ return buildSlots(schedule, controls, find_row('_id', 'routes', settings), 'pickup')[0] }, [])
   useHistoryBackTrap(handleBack)
-  useEffect(() => {
-    console.log('useEffect-dbTrack', dbTrack, prevTrack)
-    if (!dbTrack) return
-    if (dbTrack.length > 0 && dbTrack[0].hasOwnProperty('sessions')) {
-      //A log exists for this fingerprint
-      const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
-      let thisTrack = { ...dbTrack[0] }
-      console.log('useEffect-dbTrack-haslog', dIdx)
-      if (dIdx === -1) {
-        //There are no logs for this date, create one.
-        thisTrack.sessions.push({ dt: dateFormat(null), step: 0, zip: '', phone: '' })
-        console.log('useEffect-dbTrack-haslog-nodate', thisTrack)
-        mutateTrack({ ...thisTrack }, dbTrack, false)
-        setPrevTrack(null)
-      } else {
-        //A log exists
-        console.log('useEffect-dbTrack-haslog-hasdate', prevTrack, thisTrack.sessions[dIdx])
-        !prevTrack && setPrevTrack(thisTrack.sessions[dIdx])
-      }
-    } else {
-      //No log exists for this fingerprint
-      console.log('useEffect-dbTrack-nolog!')
-      mutateTrack({ _id: clientInfo.fingerprint, browser: clientInfo.client, sessions: [{ dt: dateFormat(null), step: 0, zip: '', phone: '' }] }, dbTrack, true)
-      setPrevTrack(null)
-    }
-  }, [dbTrack])
 
-  function doTrack(step: number | 'C' | 'R' | 'X', zip: string, phone: string, reason?: undefined | string) {
-    console.log(params, params.notrack)
-    if (params.notrack !== null) return
-    const dIdx: number = find_id('dt', dateFormat(null), dbTrack[0].sessions)
-    let thisTrack = { ...dbTrack[0] }
-    if (dIdx > -1) {
-      let sessions = { ...thisTrack.sessions[dIdx] }
-      if (doTrackUpdate(step, sessions.step)) {
-        sessions = { ...sessions, step: step.toString(), zip: zip, phone: phone }
-        if (reason) {
-          sessions = { ...sessions, reason: reason }
-        }
-        thisTrack.sessions[dIdx] = { ...sessions }
-        console.log(thisTrack)
-        mutateTrack({ ...thisTrack }, dbTrack, false)
-      }
-    }
-    function doTrackUpdate(step: number | 'C' | 'R' | 'X', sessionStep: any) {
-      console.log('doTrackCheck', step, prevTrack, sessionStep)
-      if (!prevTrack) return true
-      if (prevTrack.step === 'C') return false
-      if (step === 'R' && (sessionStep === 'C' || sessionStep === 'X')) return false
-      const isItNotNumber = (v: any) => isNaN(v)
-      if (prevTrack.step === 'R' || prevTrack.step === 'X') {
-        if (isItNotNumber(step)) {
-          return true
-        } else {
-          if (Number(step) > 0) return true
-        }
-        return false
-      }
-      if (isItNotNumber(step)) return true
-      return Number(step) > Number(prevTrack.step)
-    }
-  }
   const handleCustomer = (e: any) => {
     // Save the updated schedule, blank indicates that it is a Cancel
-    console.log('Main handleCustomer', e, appt, phone, sched)
+    console.log('Main handleCustomer', e, appt, phone, schedDate)
     if (e !== '' && appt) {
       console.log('handleCustomer-save')
       if (googlePlace.zip !== zip) toast.warn('Your selected delivery zip code does not match the address you provided.')
@@ -124,7 +65,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
         console.log(theseDonations)
         if (d !== undefined && d !== '') { theseDonations.push({ prod: d, qty: 0 }) }
       })
-      setDBEntry(
+      set_FormFields(
         {
           id: id,
           name: name,
@@ -133,7 +74,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
           cust: custInfo,
           zip: zip,
           place: googlePlace,
-          appt: { ...e, time: findFirstSlot(dbSched, sched) },
+          appt: { ...e, time: findFirstSlot(schedule, schedDate) },
           dt: dateFormat(null),
           src: 'w',
           calls: [],
@@ -157,31 +98,17 @@ export function Main({ sas, clientInfo, settings, id }: any) {
 
   const handleSubmit = () => {
     // Save the updated schedule, blank indicates that it is a Cancel
-    console.log('Main handleSubmit', appt, phone, sched)
-    if (!dbEntry) return
-    if (params.nosave === null) {
+    console.log('Main handleSubmit', _formFields, params.nosave, phone, schedDate)
+    if (!_formFields) return
+    if (!params.nosave) {
       doTrack('C', zip, phone)
-      addNew({ _id: sched, c: [dbEntry] }, dbSched)
-      doPhoneSave(customer, dbEntry)
-      sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: sched, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
+      doSaveStop(_formFields, whenUpdateDone)
     }
-    setSaved(true)
-    setSubmit(true)
-    setSched('')
-    setName({ first: '', last: '', company: '' })
-    setPhone('')
-    setEmail('')
-    setCustInfo({ apt: '', note: '' })
-    setImgs([])
-    setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
-    setAppt({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
-    setDBEntry(null)
-    setZip('')
-    setCurPage(5)
-    setDonationList([])
-    setCustomItems([])
-    setDonationInput('')
-    setShowExitPrompt(false)
+    function whenUpdateDone() {
+      doPhoneSave(customer, _formFields)
+      sendEMail({ email: { name: name, addr: googlePlace.addr, note: custInfo, email: email, date: schedDate, time: '' }, list: donationList, listAll: true, template: CONST_EMAILS.confirmation })
+      doReset(true)
+    }
   }
 
   async function handleBack() {
@@ -190,11 +117,6 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     return false
   }
 
-  function handlePhoneLookup() {
-    console.log('handlePhoneLookup')
-    // 
-    doPhoneLookup(phone)
-  }
   function handlePhone(p: string) {
     if (p.length === 11) {
       console.log('got phone', p)
@@ -241,39 +163,39 @@ export function Main({ sas, clientInfo, settings, id }: any) {
     thePage > maxPage && setMaxPage(thePage)
     !noTrack && doTrack(thePage, zip, phone)
   }
-  function doReset() {
-    console.log('Main doReset', sched)
-    setCurPage(0)
+  function doReset(afterUpdate = false) {
+    console.log('Main doReset', schedDate)
+    setCurPage(afterUpdate ? 5 : 0)
+    setSubmit(afterUpdate)
     setMaxPage(0)
     setSaved(false)
     setDonationList([])
     setCustomItems([])
     setHavePhotos(false)
-    setSched('')
+    setSchedDate('')
     setName({ first: '', last: '', company: '' })
     setPhone('')
     setEmail('')
     setCustInfo({ apt: '', note: '' })
     setImgs([])
-    setGooglePlace({})
+    setGooglePlace({ addr: '', lat: '', lng: '', zip: '' })
     setAppt({ id: id, slot: '1', rt: 'Unassigned', time: '1', cell: '' })
-    setDBEntry(null)
+    set_FormFields(null)
     setZip('')
-    setSubmit(false)
     setCancelled(false)
     setDonationInput('')
     setShowExitPrompt(false)
-
   }
+
   return (
     <>
-      {!dbSched ? <div>Loading...</div> :
+      {!schedule ? <div>Loading...</div> :
         <>
-          <BreadCrumbs crumbs={(!cancelled && !saved) ? [zip, sched, donationList.length > 0 ? 'items' : '', havePhotos ? 'photo' : ''] : []} />
+          <BreadCrumbs crumbs={(!cancelled && !saved) ? [zip, schedDate, donationList.length > 0 ? 'items' : '', havePhotos ? 'photo' : ''] : []} />
           {/* <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={curPage < maxPage} /> */}
           <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={false} />
 
-          <ZipList isOpen={curPage === 0} availSlots={zipAvailSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={sched} setSched={(e: any) => { handleNext(1); setSched(e) }} setZip={(e: string) => setZip(e)} />
+          <ZipList isOpen={curPage === 0} availSlots={zipAvailSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={schedDate} setSched={(e: any) => { handleNext(1); setSchedDate(e) }} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={curPage === 1} setUnderstood={() => handleNext(2)} />
           <Donations isOpen={curPage === 2}
             donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }}
@@ -298,7 +220,7 @@ export function Main({ sas, clientInfo, settings, id }: any) {
             setAppt={(e: any) => setAppt(e)}
             setHaveCustomer={(e: any) => { handleNext(5, e === ''); handleCustomer(e) }}
           />
-          <Confirm isOpen={curPage === 5} dbEntry={dbEntry} setSubmit={() => handleSubmit()} />
+          <Confirm isOpen={curPage === 5} appt={_formFields} setSubmit={() => handleSubmit()} />
           <Saved isOpen={submit} onClick={() => handleCancel('C')} />
           <Cancelled isOpen={cancelled} reason={reason} setReason={(e: any) => setReason(e)} onClick={() => handleCancel('X')} />
         </>
@@ -307,24 +229,24 @@ export function Main({ sas, clientInfo, settings, id }: any) {
   )
 }
 
-function Confirm({ isOpen, dbEntry, setSubmit }: any) {
+function Confirm({ isOpen, appt, setSubmit }: any) {
   // console.log(isOpen, dbEntry);
   return (
     <>
-      {(isOpen && dbEntry) && <div className=''>
+      {(isOpen && appt) && <div className=''>
         <h3>Please confirm your Pickup.</h3>
         <div className='confirmdiv'>
           <div>Date:</div>
-          <div>{dbEntry.dt}</div>
+          <div>{appt.dt}</div>
           <div>Name:</div>
-          <div>{`${dbEntry.name.first} ${dbEntry.name.last}`}</div>
+          <div>{`${appt.name.first} ${appt.name.last}`}</div>
           <div>Phone:</div>
-          <div>{dbEntry.phone}</div>
+          <div>{appt.phone}</div>
           <div>Address:</div>
-          <div>{dbEntry.place.addr}</div>
+          <div>{appt.place.addr}</div>
           <div>Items:</div>
           <div>{
-            dbEntry.items.map((ti: any, k: number) => (
+            appt.items.map((ti: any, k: number) => (
               <div key={k}>
                 {ti.qty === 0 ? `${ti.prod}` : `${ti.prod}(${ti.qty})`}
               </div>
@@ -335,7 +257,7 @@ function Confirm({ isOpen, dbEntry, setSubmit }: any) {
           <div className='photogrid'>
             <div className="container">
               {
-                dbEntry.imgs.map((img: any, k: number) => (
+                appt.imgs.map((img: any, k: number) => (
                   <div className="image" key={k}>
                     <img key={k} title='item image'
                       src={`${import.meta.env.VITE_STORAGEIMAGEURL}${img}`}

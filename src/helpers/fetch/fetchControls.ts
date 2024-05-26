@@ -1,0 +1,1 @@
+export const fetchControls = { url: `${import.meta.env.VITE_MONGO_URL}?req=${encodeURIComponent(JSON.stringify({ method: 'find', db: 'Truck', collection: 'Controls' }))}`, init: { method: 'GET', headers: new Headers } }
