@@ -1,5 +1,7 @@
 # HabiStore Online Donation Pickup Scheduling Web App
 
+Don't allow refresh/clear/close before email is sent. 
+
 This is to be used by Tucson HabiStore's donors to schedule pickups of donated items.
 00x) added name to confirmation email.
 

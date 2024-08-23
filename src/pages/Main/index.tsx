@@ -195,7 +195,7 @@ export function Main({ sas, clientInfo, schedule, settings, session, controls, i
           {/* <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={curPage < maxPage} /> */}
           <Navigation onClick={(e: number) => handleNav(e)} showBack={curPage > 0} showDone={saved || cancelled} showNext={false} />
 
-          <ZipList isOpen={curPage === 0} availSlots={zipAvailSlots} zip={zip} holidays={find_row('_id', 'Holidays', settings)} sched={schedDate} setSched={(e: any) => { handleNext(1); setSchedDate(e) }} setZip={(e: string) => setZip(e)} />
+          <ZipList isOpen={curPage === 0} availSlots={zipAvailSlots} zip={zip} notes={find_row('_id', 'routes', settings).notes} holidays={find_row('_id', 'Holidays', settings)} sched={schedDate} setSched={(e: any) => { handleNext(1); setSchedDate(e) }} setZip={(e: string) => setZip(e)} />
           <NotAccepted isOpen={curPage === 1} setUnderstood={() => handleNext(2)} />
           <Donations isOpen={curPage === 2}
             donations={donationList} setDonations={(e: any) => { handleNext(3); setDonationList(e) }}
@@ -342,13 +342,14 @@ function Navigation({ onClick, showBack, showDone, showNext }: any) {
 interface IZip {
   isOpen: boolean
   availSlots: any
+  notes: any
   holidays: any
   zip: string
   sched: string
   setSched: Function
   setZip: Function
 }
-function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }: IZip) {
+function ZipList({ isOpen, availSlots, zip, notes, holidays, sched, setSched, setZip }: IZip) {
   const zipOpen = () => {
     return zip.length === 5
   }
@@ -361,6 +362,7 @@ function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }:
     if (thisSlot.t - thisSlot.u < CONST_ROUTE_MAX) return true
     return holidays.dates.some((theHoliday: any) => theHoliday.date === thisSlot.d)
   }
+  console.log(notes[zip], notes, holidays)
   return (<>
     {isOpen && availSlots &&
       <>
@@ -372,11 +374,14 @@ function ZipList({ isOpen, availSlots, zip, holidays, sched, setSched, setZip }:
               {availSlots[zip].map((availSlot: any, key: number) => (
                 <Button key={key} variant={sched === availSlot.d ? 'contained' : 'outlined'} classes={isDayClosed(availSlot) ? 'hidden' : ''} onClick={() => setSched(`${availSlot.d}`)}>{dateDayName(availSlot.d)} {availSlot.d}</Button>
               ))}
+
             </div>
             :
             !zipOpen() && <h1 className='ziptext'>Tucson's Most Trusted Home Improvement Superstore</h1>
           }
-
+          {notes[zip] !== undefined && notes[zip] !== '' &&
+            <h3 className='zip-note'>{notes[zip]}</h3>
+          }
         </div>
       </>
     }
