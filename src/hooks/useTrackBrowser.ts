@@ -53,19 +53,19 @@ export function useTrackBrowser({ browserSession, clientInfo, dt, setter, notrac
     }, [])
 
     function doTrack(step: number | 'C' | 'R' | 'X', zip: string, phone: string, reason?: undefined | string) {
-        console.log(browserSession, step, zip, phone, reason, notrack)
+        console.log('doTrack', browserSession, step, zip, phone, reason, notrack)
         if (notrack) return
         if (!browserSession) {
-            alert('!browserSession')
+            console.warn('!browserSession')
             return
         }
         if (browserSession.length === 0 || !browserSession[0].hasOwnProperty('sessions')) {
-            alert('empty browserSession')
+            console.warn('empty browserSession')
             return
         }
         const sessionIdx: number = find_id('dt', dt, browserSession![0].sessions)
         if (sessionIdx < 0) {
-            alert('empty sessions')
+            console.warn('empty sessions')
             return
         }
         let thisSession: sessionT = browserSession![0].sessions[sessionIdx]
