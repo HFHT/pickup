@@ -84,7 +84,7 @@ export const Autocomplete = ({ place, initValue, setPlace, setHavePlace }: IAddr
     return (
         <div className='autodiv addrdiv'>
             <label className='text-sm'>
-                <input ref={inputRef} type='text' placeholder='Address' value={place.addr} onChange={handleInputChange} onBlur={handleBlur} />
+                <input ref={inputRef} type='text' placeholder='Address *' value={place.addr} onChange={handleInputChange} onBlur={handleBlur} />
             </label >
         </div>
     );
