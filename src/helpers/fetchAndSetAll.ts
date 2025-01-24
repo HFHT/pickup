@@ -22,12 +22,22 @@ export const fetchAndSetAll = async (collection: any, isGpt: boolean = false) =>
     });
 
     function choose(b: boolean, g: any) {
-        // console.log(g)
+        console.log(g)
         if (g.hasOwnProperty('choices')) {
-            // console.log(g.choices[0].text)
-            // console.log(g.choices[0].text.replace(/[\r\n|\n]+/gm, ''))
+            let retObj = g.choices[0].text
+            if (retObj) {
+                retObj = truncateString(retObj, '<|endoftext|>')
+                return JSON.parse(retObj)
+            }
+            console.log(g.choices[0].text)
+            console.log(g.choices[0].text.replace(/[\r\n|\n]+/gm, ''))
             return g.choices[0].text === '' ? [] : JSON.parse(g.choices[0].text)
         }
         return g
     }
 };
+
+export function truncateString(str: string, match: string): string {
+    const parts = str.split(match);
+    return parts.length > 1 ? parts[0] : str;
+}
