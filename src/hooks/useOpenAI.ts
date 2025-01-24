@@ -16,17 +16,15 @@ export function useOpenAI() {
             method: "POST",
             headers: headers,
             body: JSON.stringify({
-                model: import.meta.env.VITE_GPT_MODEL,
+                items: userData,
                 prompt: userData,
-                temperature: 0.2,
-                max_tokens: 600
             })
         };
 
         try {
             fetchAndSetAll([
                 {
-                    url: `${import.meta.env.VITE_AZURE_FUNC_URL}/api/HFHTChatGPT`,
+                    url: `${import.meta.env.VITE_SCHEDULER_URL}getOpenAI`,
                     init: optionsDesc,
                     setter: checkNoResponse
                 }

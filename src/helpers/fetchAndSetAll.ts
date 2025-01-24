@@ -22,18 +22,20 @@ export const fetchAndSetAll = async (collection: any, isGpt: boolean = false) =>
     });
 
     function choose(b: boolean, g: any) {
-        console.log(g)
-        if (g.hasOwnProperty('choices')) {
-            let retObj = g.choices[0].text
+        let initVal = [{ qty: 0, prod: '', category: '' }]
+        console.log('ChatGPT-fetchJson', g)
+        if (g.choices.length === 0) return [...initVal]
+        try {
+            let retObj = g.choices[0].message.content
             if (retObj) {
-                retObj = truncateString(retObj, '<|endoftext|>')
-                return JSON.parse(retObj)
+                let retVal = JSON.parse(retObj)
+                if (retVal && retVal.products) return retVal.products
             }
-            console.log(g.choices[0].text)
-            console.log(g.choices[0].text.replace(/[\r\n|\n]+/gm, ''))
-            return g.choices[0].text === '' ? [] : JSON.parse(g.choices[0].text)
+        } catch (e) {
+            console.log(g)
+            console.log(e)
         }
-        return g
+        return [...initVal]
     }
 };
 
